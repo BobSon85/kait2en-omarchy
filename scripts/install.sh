@@ -35,7 +35,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable kait2en-dsp-update.timer
 sudo systemctl start kait2en-dsp-update.service
 sudo systemctl start kait2en-dsp-update.timer
-systemctl --user restart wireplumber
+if ! systemctl --user restart wireplumber; then
+  echo "Warning: could not restart the current user's WirePlumber session." >&2
+  echo "Log out/in or run: systemctl --user restart wireplumber" >&2
+fi
 sleep 2
 echo
 echo "KAIT2EN installation finished. Check with: wpctl status"

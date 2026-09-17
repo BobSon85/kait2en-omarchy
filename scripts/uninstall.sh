@@ -15,5 +15,7 @@ sudo rm -f /etc/systemd/system/kait2en-dsp-update.service \
   /usr/share/wireplumber/wireplumber.conf.d/51-kait2en-dsp.conf
 sudo systemctl daemon-reload
 sudo udevadm control --reload-rules || true
-systemctl --user restart wireplumber
+if ! systemctl --user restart wireplumber; then
+  echo "Warning: could not restart the current user's WirePlumber session." >&2
+fi
 echo "KAIT2EN system integration removed. Backups were not deleted."

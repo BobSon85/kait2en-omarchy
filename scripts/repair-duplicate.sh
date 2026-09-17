@@ -12,5 +12,7 @@ if [[ -e "$disabled_dir" ]]; then
   exit 2
 fi
 mv "$source_dir" "$disabled_dir"
-systemctl --user restart wireplumber
-echo "Moved duplicate Bankstown to $disabled_dir and restarted WirePlumber."
+if ! systemctl --user restart wireplumber; then
+  echo "Warning: could not restart the current user's WirePlumber session." >&2
+fi
+echo "Moved duplicate Bankstown to $disabled_dir; WirePlumber restart was requested."
