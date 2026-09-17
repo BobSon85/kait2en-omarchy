@@ -33,6 +33,10 @@ uninstaller disables only files owned by this integration and leaves backups in
 The plugin also includes a repair action for the known failure mode where a
 user-local Bankstown checkout duplicates the system LV2 plugin.
 
+The panel exposes both the optional 8-band user EQ and the KAIT2EN
+virtual-bass amount. The latter is stored separately from upstream graphs and
+reapplied by the system updater after a profile update.
+
 ## Development
 
 Validate the manifest with:
@@ -49,8 +53,7 @@ omarchy-shell shell rescanPlugins
 omarchy plugin enable kait2en.audio
 ```
 
-The installer and updater are intentionally still being developed. They must
-detect the hardware profile from upstream KAIT2EN data, create backups, and
+The installer and updater detect the hardware profile, create backups, and
 never touch unsupported Macs.
 
 ## License

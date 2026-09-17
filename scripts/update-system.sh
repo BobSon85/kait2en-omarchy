@@ -5,6 +5,7 @@ BASE=/var/lib/kait2en-dsp
 REPO="$BASE/KaiT2en-Fedora"
 BANK="$BASE/bankstown"
 MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
+SETTINGS=/etc/kait2en-omarchy/settings.conf
 
 profile_for_model() {
   case "$1" in
@@ -23,6 +24,19 @@ PROFILE=$(profile_for_model "$MODEL") || {
   exit 0
 }
 
+BASS_AMT=3.0
+if [[ -f "$SETTINGS" ]]; then
+  # Only this variable is accepted from the administrator-owned settings file.
+  # shellcheck disable=SC1090
+  source "$SETTINGS"
+fi
+[[ "$BASS_AMT" =~ ^[0-9]+([.][0-9]+)?$ ]] || { echo 'KAIT2EN: invalid BASS_AMT' >&2; exit 1; }
+awk -v v="$BASS_AMT" 'BEGIN { exit !(v >= 0 && v <= 15) }' || { echo 'KAIT2EN: BASS_AMT outside 0..15' >&2; exit 1; }
+if [[ ! -f "$SETTINGS" && -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
+  current_amt=$(sed -n 's/.*"amt"[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" | head -1)
+  [[ "$current_amt" =~ ^[0-9]+([.][0-9]+)?$ ]] && BASS_AMT="$current_amt"
+fi
+
 mkdir -p "$BASE" "$BASE/backups"
 if [[ ! -d "$REPO/.git" ]]; then
   git clone --depth 1 --branch main https://github.com/kaiT2en/KaiT2en-Fedora "$REPO"
@@ -38,7 +52,7 @@ else
 fi
 
 REV=$(git -C "$REPO" rev-parse HEAD)
-if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
+if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && -f "$BASE/installed-bass" && $(<"$BASE/installed-bass") == "$BASS_AMT" && -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
   echo "KAIT2EN: already current ($REV)"
   exit 0
 fi
@@ -57,6 +71,8 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 install -d /usr/share/t2-dsp/profiles /usr/lib/lv2/bankstown.lv2 /usr/share/wireplumber/wireplumber.conf.d
 rm -rf /usr/share/t2-dsp/profiles
 cp -a "$REPO/dsp/build/profiles" /usr/share/t2-dsp/
+sed -Ei "0,/\"amt\"[[:space:]]*:[[:space:]]*[0-9.]+/s//\"amt\": $BASS_AMT/" \
+  "/usr/share/t2-dsp/profiles/$PROFILE/graph.json"
 rm -rf /usr/lib/lv2/bankstown.lv2
 install -m 0755 "$BANK/target/release/libbankstown.so" /usr/lib/lv2/bankstown.lv2/bankstown.so
 install -m 0644 "$BANK/bankstown.ttl" "$BANK/manifest.ttl" /usr/lib/lv2/bankstown.lv2/
@@ -76,4 +92,5 @@ wireplumber.profiles = { main = { node.software-dsp = required } }
 EOF
 
 printf '%s\n' "$REV" > "$BASE/installed-rev"
-echo "KAIT2EN: installed $MODEL ($PROFILE), revision $REV"
+printf '%s\n' "$BASS_AMT" > "$BASE/installed-bass"
+echo "KAIT2EN: installed $MODEL ($PROFILE), revision $REV, bass amount $BASS_AMT"

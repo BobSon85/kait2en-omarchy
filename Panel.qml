@@ -19,11 +19,13 @@ Panel {
   property string statusError: ""
   property string page: "status"
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
+  property real bassAmount: 3.0
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
   readonly property string diagnoseScript: String(Qt.resolvedUrl("scripts/diagnose.sh")).replace(/^file:\/\//, "")
   readonly property string installScript: String(Qt.resolvedUrl("scripts/install.sh")).replace(/^file:\/\//, "")
   readonly property string repairScript: String(Qt.resolvedUrl("scripts/repair-duplicate.sh")).replace(/^file:\/\//, "")
+  readonly property string bassScript: String(Qt.resolvedUrl("scripts/set-bass.sh")).replace(/^file:\/\//, "")
   readonly property string eqScript: String(Qt.resolvedUrl("eq/apply.sh")).replace(/^file:\/\//, "")
 
   property Process statusProcess: Process {
@@ -34,6 +36,7 @@ Panel {
       if (code === 0) {
         try {
           root.status = JSON.parse(statusOutput.text)
+          root.bassAmount = Number(root.status.bassAmount || 3.0)
           root.statusError = ""
         } catch (error) {
           root.statusError = "Invalid status response"
@@ -169,6 +172,20 @@ Panel {
         Text { text: value("timerEnabled", false) ? "timer aktywny" : "timer wyłączony"; color: value("timerEnabled", false) ? Color.success : Color.warning; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Wyjście"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; elide: Text.ElideRight; Layout.maximumWidth: Style.space(260) }
+      }
+
+      RowLayout {
+        visible: root.page === "status"
+        Layout.fillWidth: true
+        Text { text: "KAIT2EN bass"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Slider {
+          Layout.fillWidth: true
+          from: 0; to: 8; stepSize: 0.5
+          value: root.bassAmount
+          onMoved: root.bassAmount = value
+        }
+        Text { text: Number(root.bassAmount).toFixed(1); Layout.preferredWidth: Style.space(34); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Button { text: "Zastosuj"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.bassScript, Number(root.bassAmount).toFixed(1)]) }
       }
 
       Text {

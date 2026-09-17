@@ -51,5 +51,11 @@ else
   duplicate_bankstown=false
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"duplicateBankstown":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" "$duplicate_bankstown"
+bass=3.0
+if [[ "$profile" != unsupported && -f "/usr/share/t2-dsp/profiles/$profile/graph.json" ]]; then
+  detected_bass=$(sed -n 's/.*"amt"[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' "/usr/share/t2-dsp/profiles/$profile/graph.json" | head -1)
+  [[ "$detected_bass" =~ ^[0-9]+([.][0-9]+)?$ ]] && bass="$detected_bass"
+fi
+
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"duplicateBankstown":%s,"bassAmount":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" "$duplicate_bankstown" "$bass"
