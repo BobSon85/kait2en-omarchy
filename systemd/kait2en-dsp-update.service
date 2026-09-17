@@ -1,0 +1,8 @@
+[Unit]
+Description=Update KaiT2en host-side T2 audio DSP
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/kait2en-omarchy-update

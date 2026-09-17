@@ -1,0 +1,10 @@
+[Unit]
+Description=Check KaiT2en DSP for updates daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target

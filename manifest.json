@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "kait2en.audio",
+  "name": "KaiT2en Audio DSP",
+  "version": "0.1.0",
+  "author": "Krzysiek",
+  "license": "GPL-3.0-or-later",
+  "description": "Native KAIT2EN audio DSP management for Apple T2 Macs on Omarchy.",
+  "kinds": ["bar-widget", "panel"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "KaiT2en Audio",
+    "description": "Show KAIT2EN DSP status and configure Apple T2 audio.",
+    "category": "Audio",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "showModel": true,
+      "refreshSeconds": 10
+    },
+    "schema": [
+      {
+        "key": "showModel",
+        "type": "boolean",
+        "label": "Show Mac model",
+        "defaultValue": true
+      },
+      {
+        "key": "refreshSeconds",
+        "type": "number",
+        "label": "Refresh interval (seconds)",
+        "defaultValue": 10
+      }
+    ]
+  }
+}
