@@ -6,4 +6,5 @@ for file in "$ROOT/scripts/status.sh" "$ROOT/scripts/diagnose.sh" "$ROOT/scripts
 done
 omarchy plugin validate "$ROOT"
 "$ROOT/tests/test-eq.sh"
+"$ROOT/tests/test-model-matrix.sh"
 printf '%s\n' 'plugin manifest and shell scripts: OK'

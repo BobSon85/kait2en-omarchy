@@ -5,4 +5,5 @@ for file in "$ROOT/scripts/status.sh" "$ROOT/scripts/diagnose.sh" "$ROOT/scripts
   bash -n "$file"
 done
 python3 -m json.tool "$ROOT/manifest.json" >/dev/null
+"$ROOT/tests/test-model-matrix.sh"
 printf '%s\n' 'portable shell and manifest checks: OK'

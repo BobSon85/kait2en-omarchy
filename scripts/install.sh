@@ -4,7 +4,9 @@ set -Eeuo pipefail
 ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
 case "$MODEL" in
-  MacBookAir8,1|MacBookAir8,2|MacBookAir9,1|MacBookPro15,*|MacBookPro16,*) ;;
+  MacBookAir8,1|MacBookAir8,2|MacBookAir9,1|\
+  MacBookPro15,1|MacBookPro15,2|MacBookPro15,3|MacBookPro15,4|\
+  MacBookPro16,1|MacBookPro16,2|MacBookPro16,3|MacBookPro16,4) ;;
   *) echo "KAIT2EN: unsupported or unknown model: $MODEL" >&2; exit 2 ;;
 esac
 
