@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 
-for required in manifest.json README.md LICENSE; do
+for required in manifest.json README.md LICENSE SECURITY.md; do
   [[ -s "$ROOT/$required" ]] || { echo "missing required file: $required" >&2; exit 1; }
 done
 
