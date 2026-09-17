@@ -15,12 +15,18 @@ if [[ ! -f /etc/arch-release ]]; then
   exit 2
 fi
 
+if ! modinfo t2bce_audio >/dev/null 2>&1; then
+  echo "KAIT2EN: t2bce_audio is not available in the running kernel." >&2
+  echo "Boot a T2-enabled kernel (for example linux-t2) before installing." >&2
+  exit 2
+fi
+
 echo "KAIT2EN installer for $MODEL"
 echo "This will install dependencies, build upstream DSP components and create a system timer."
 read -r -p "Continue? [y/N] " answer
 [[ "$answer" =~ ^[Yy]$ ]] || { echo "Cancelled."; exit 0; }
 
-sudo pacman -S --needed pipewire pipewire-audio pipewire-pulse pipewire-alsa wireplumber lsp-plugins-lv2 git rust base-devel
+sudo pacman -S --needed apple-t2-audio-config pipewire pipewire-audio pipewire-pulse pipewire-alsa wireplumber lsp-plugins-lv2 git rust base-devel
 sudo install -d /usr/local/libexec /etc/systemd/system
 sudo install -m 0755 "$ROOT/scripts/update-system.sh" /usr/local/libexec/kait2en-omarchy-update
 sudo install -m 0644 "$ROOT/systemd/kait2en-dsp-update.service" /etc/systemd/system/kait2en-dsp-update.service

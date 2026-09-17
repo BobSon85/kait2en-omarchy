@@ -17,6 +17,8 @@ done
 
 rg -q 'HiFi: Mic: source' "$ROOT/scripts/update-system.sh"
 rg -q 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
+rg -q 'apple-t2-audio-config' "$ROOT/scripts/install.sh"
+rg -q 'modinfo t2bce_audio' "$ROOT/scripts/install.sh"
 
 if rg -q 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then
   echo 'installer contains an overly broad MacBook Pro pattern' >&2

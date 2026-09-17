@@ -24,11 +24,12 @@ MacBookPro16,1–16,4. Unknown models are rejected before any privileged action.
 
 ## System integration
 
-`install.sh` is intentionally a visible terminal workflow. It installs the
-Arch dependencies, builds the upstream DSP graph and Bankstown, installs the
-WirePlumber and udev rules and enables the daily `kait2en-dsp-update.timer`. The
-uninstaller disables only files owned by this integration and leaves backups in
-`/var/lib/kait2en-dsp`.
+`install.sh` is intentionally a visible terminal workflow. It verifies that a
+T2-enabled kernel exposes `t2bce_audio`, installs the Arch dependencies
+including `apple-t2-audio-config` (UCM), builds the upstream DSP graph and
+Bankstown, installs the WirePlumber and udev rules and enables the daily
+`kait2en-dsp-update.timer`. The uninstaller disables only files owned by this
+integration and leaves backups in `/var/lib/kait2en-dsp`.
 
 The generated profile target adapts to both the legacy `Audio` ALSA card id and
 the upstream model-specific `t2-*` id. Speaker and internal-microphone
