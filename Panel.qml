@@ -20,6 +20,7 @@ Panel {
   property string page: "status"
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
   property real bassAmount: 3.0
+  property bool eqDirty: false
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
   readonly property string diagnoseScript: String(Qt.resolvedUrl("scripts/diagnose.sh")).replace(/^file:\/\//, "")
@@ -37,6 +38,8 @@ Panel {
         try {
           root.status = JSON.parse(statusOutput.text)
           root.bassAmount = Number(root.status.bassAmount || 3.0)
+          if (!root.eqDirty && Array.isArray(root.status.eqGains))
+            root.eqGains = root.status.eqGains
           root.statusError = ""
         } catch (error) {
           root.statusError = "Invalid status response"
@@ -74,11 +77,13 @@ Panel {
 
   function applyEq() {
     eqProcess.command = [root.eqScript, "1"].concat(root.eqGains.map(function(v) { return Number(v).toFixed(2) }))
+    root.eqDirty = false
     eqProcess.running = true
   }
 
   function disableEq() {
     eqProcess.command = [root.eqScript, "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+    root.eqDirty = false
     eqProcess.running = true
   }
 
@@ -219,7 +224,12 @@ Panel {
               Layout.fillWidth: true
               from: -6; to: 6; stepSize: 0.5
               value: root.eqGains[index]
-              onMoved: root.eqGains[index] = value
+              onMoved: {
+                var updated = root.eqGains.slice()
+                updated[index] = value
+                root.eqGains = updated
+                root.eqDirty = true
+              }
             }
             Text { text: (root.eqGains[index] >= 0 ? "+" : "") + Number(root.eqGains[index]).toFixed(1) + " dB"; Layout.preferredWidth: Style.space(62); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
           }

@@ -57,5 +57,24 @@ if [[ "$profile" != unsupported && -f "/usr/share/t2-dsp/profiles/$profile/graph
   [[ "$detected_bass" =~ ^[0-9]+([.][0-9]+)?$ ]] && bass="$detected_bass"
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"duplicateBankstown":%s,"bassAmount":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" "$duplicate_bankstown" "$bass"
+eq_enabled=false
+eq_gains='[0,0,0,0,0,0,0,0]'
+eq_state="${XDG_CONFIG_HOME:-$HOME/.config}/kait2en-omarchy/eq.state"
+if [[ -f "$eq_state" ]]; then
+  read -r -a saved_gains < "$eq_state" || true
+  if (( ${#saved_gains[@]} == 8 )); then
+    valid_eq=true
+    for gain in "${saved_gains[@]}"; do
+      if ! [[ "$gain" =~ ^-?[0-9]+([.][0-9]+)?$ ]] || ! awk -v v="$gain" 'BEGIN { exit !(v >= -6 && v <= 6) }'; then
+        valid_eq=false
+      fi
+    done
+    if [[ "$valid_eq" == true ]]; then
+      eq_enabled=true
+      eq_gains="[$(IFS=,; printf '%s' "${saved_gains[*]}")]"
+    fi
+  fi
+fi
+
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"
