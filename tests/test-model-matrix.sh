@@ -24,6 +24,13 @@ grep -qE 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
 grep -qE 'alsa-ucm-conf' "$ROOT/scripts/install.sh"
 grep -qE 't2bce_audio-alsa-ucm-conf' "$ROOT/scripts/update-system.sh"
 grep -qE 'modinfo t2bce_audio' "$ROOT/scripts/install.sh"
+grep -qE 'default\.clock\.quantum = 1024' "$ROOT/scripts/update-system.sh"
+grep -qE 'default\.clock\.min-quantum = 1024' "$ROOT/scripts/update-system.sh"
+grep -qE '90-kait2en-t2-audio\.conf' "$ROOT/scripts/uninstall.sh"
+grep -qE 'pipewireQuantum' "$ROOT/scripts/status.sh"
+grep -qE 'dsp\|native' "$ROOT/scripts/set-output-mode.sh"
+grep -qE 'set-default-sink' "$ROOT/scripts/set-output-mode.sh"
+grep -qE 'move-sink-input' "$ROOT/scripts/set-output-mode.sh"
 
 if grep -qE 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then
   echo 'installer contains an overly broad MacBook Pro pattern' >&2

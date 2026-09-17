@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kait2en.audio",
   "name": "KaiT2en Audio DSP",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "author": "Krzysiek",
   "license": "GPL-3.0-or-later",
   "description": "Native KaiT2en speaker DSP, automatic updates and diagnostics for Apple T2 Macs running Arch Linux and Omarchy.",

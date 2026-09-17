@@ -27,6 +27,19 @@ esac
 
 sink=$(pactl info 2>/dev/null | sed -n 's/^Default Sink: //p')
 [[ -n "$sink" ]] || sink=unknown
+native_sink=$(pactl list sinks short 2>/dev/null | awk '$2 ~ /^alsa_output\..*HiFi__Speaker__sink$/ { print $2; exit }')
+[[ -n "$native_sink" ]] || native_sink=unknown
+output_mode=other
+[[ "$sink" == "audio_effect.t2-${dsp_name:-unsupported}-speakers" ]] && output_mode=dsp
+[[ "$sink" == "$native_sink" ]] && output_mode=native
+pipewire_quantum=unknown
+pipewire_min_quantum=unknown
+if command -v pw-metadata >/dev/null 2>&1; then
+  pipewire_quantum=$(pw-metadata -n settings 2>/dev/null | sed -n "s/.*key:'clock.quantum' value:'\([0-9]*\)'.*/\1/p" | head -1)
+  pipewire_min_quantum=$(pw-metadata -n settings 2>/dev/null | sed -n "s/.*key:'clock.min-quantum' value:'\([0-9]*\)'.*/\1/p" | head -1)
+fi
+[[ "$pipewire_quantum" =~ ^[0-9]+$ ]] || pipewire_quantum=unknown
+[[ "$pipewire_min_quantum" =~ ^[0-9]+$ ]] || pipewire_min_quantum=unknown
 if pactl list sinks short 2>/dev/null | awk '{print $2}' | grep -Fxq "audio_effect.t2-${dsp_name:-unsupported}-speakers"; then
   dsp_sink=true
 else
@@ -86,6 +99,6 @@ if [[ -f "$eq_state" ]]; then
   fi
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"dspSource":%s,"defaultSink":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$dsp_source" "$(json_escape "$sink")" "$timer_enabled" \
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"dspSource":%s,"defaultSink":"%s","nativeSink":"%s","outputMode":"%s","pipewireQuantum":"%s","pipewireMinQuantum":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$dsp_source" "$(json_escape "$sink")" "$(json_escape "$native_sink")" "$output_mode" "$pipewire_quantum" "$pipewire_min_quantum" "$timer_enabled" \
   "$(json_escape "$installed_revision")" "$(json_escape "$installed_bank_revision")" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"

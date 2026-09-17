@@ -32,6 +32,24 @@ BarWidget {
     if (panelItem) panelItem.toggle()
   }
 
+  // Forward the panel lifecycle contract expected by Omarchy's popout
+  // coordinator. Without this, a KeyboardPanel can leave the bar's popout
+  // state stuck after the first open/close cycle.
+  readonly property bool popoutSwitchClosing: panelItem ? panelItem.popoutSwitchClosing === true : false
+
+  function open() {
+    if (panelItem) panelItem.open()
+  }
+
+  function close() {
+    if (panelItem) panelItem.close()
+  }
+
+  function closeForPopoutSwitch() {
+    if (panelItem && typeof panelItem.closeForPopoutSwitch === "function")
+      panelItem.closeForPopoutSwitch()
+  }
+
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
   onBarChanged: injectPanel()
@@ -62,7 +80,7 @@ BarWidget {
     anchors.fill: parent
     bar: root.bar
     text: "󰓃"
-    foreground: "#FFFFFF"
+    foreground: root.bar ? root.bar.foreground : Color.foreground
     active: root.iconInactive
     activeColor: Color.urgent
     tooltipText: root.opened ? "Close KaiT2en Audio" : "KaiT2en Audio"

@@ -6,8 +6,11 @@ REPO="$BASE/KaiT2en-Fedora"
 BANK="$BASE/bankstown"
 MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
 SETTINGS=/etc/kait2en-omarchy/settings.conf
+PIPEWIRE_CONF=/etc/pipewire/pipewire.conf.d/90-kait2en-t2-audio.conf
+PIPEWIRE_MARKER='# Managed by KaiT2en Omarchy: T2 audio stability.'
+PIPEWIRE_CONF_CHANGED=0
 
-restart_logged_in_wireplumber() {
+restart_logged_in_audio() {
   local user uid runtime bus
   user=$(loginctl list-users --no-legend 2>/dev/null | awk '$1 >= 1000 { print $2; exit }' || true)
   [[ -n "$user" ]] || return 0
@@ -15,7 +18,25 @@ restart_logged_in_wireplumber() {
   runtime="/run/user/$uid"
   bus="unix:path=$runtime/bus"
   runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" DBUS_SESSION_BUS_ADDRESS="$bus" \
-    systemctl --user restart wireplumber || true
+    systemctl --user restart pipewire pipewire-pulse wireplumber || true
+}
+
+ensure_pipewire_stability() {
+  mkdir -p "$(dirname "$PIPEWIRE_CONF")" "$BASE/backups"
+  if [[ -f "$PIPEWIRE_CONF" ]] && ! grep -Fq "$PIPEWIRE_MARKER" "$PIPEWIRE_CONF"; then
+    cp -a "$PIPEWIRE_CONF" "$BASE/backups/$(date +%Y%m%d-%H%M%S)-pipewire-quantum.conf"
+  fi
+  if [[ ! -f "$PIPEWIRE_CONF" ]] || ! grep -Fq "$PIPEWIRE_MARKER" "$PIPEWIRE_CONF"; then
+    cat > "$PIPEWIRE_CONF" <<'EOF'
+# Managed by KaiT2en Omarchy: T2 audio stability.
+# Apple T2 speaker paths are prone to ALSA underruns at 256 frames.
+context.properties = {
+    default.clock.quantum = 1024
+    default.clock.min-quantum = 1024
+}
+EOF
+    PIPEWIRE_CONF_CHANGED=1
+  fi
 }
 
 profile_for_model() {
@@ -34,6 +55,8 @@ PROFILE=$(profile_for_model "$MODEL") || {
   echo "KAIT2EN: unsupported model $MODEL; leaving audio untouched" >&2
   exit 0
 }
+
+mkdir -p "$BASE" "$BASE/backups"
 
 BASS_AMT=3.0
 if [[ -f "$SETTINGS" ]]; then
@@ -71,7 +94,9 @@ if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && \
       -f "$BASE/installed-bass" && $(<"$BASE/installed-bass") == "$BASS_AMT" && \
       -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" && \
       -f "/usr/share/alsa/ucm2/AppleT2/HiFi-x2.conf" ]]; then
+  ensure_pipewire_stability
   echo "KAIT2EN: already current ($REV)"
+  (( PIPEWIRE_CONF_CHANGED )) && restart_logged_in_audio
   exit 0
 fi
 
@@ -81,6 +106,7 @@ cargo build --release --manifest-path "$BANK/Cargo.toml"
   echo "KAIT2EN: upstream did not produce complete profile $PROFILE" >&2
   exit 1
 }
+ensure_pipewire_stability
 
 STAMP=$(date +%Y%m%d-%H%M%S)
 [[ -d "$UCM_SRC" ]] || { echo "KAIT2EN: upstream UCM files are missing" >&2; exit 1; }
@@ -163,5 +189,5 @@ EOF
 printf '%s\n' "$REV" > "$BASE/installed-rev"
 printf '%s\n' "$BANK_REV" > "$BASE/installed-bank-rev"
 printf '%s\n' "$BASS_AMT" > "$BASE/installed-bass"
-restart_logged_in_wireplumber
+restart_logged_in_audio
 echo "KAIT2EN: installed $MODEL ($PROFILE), KAIT2EN $REV, Bankstown $BANK_REV, bass amount $BASS_AMT"

@@ -4,6 +4,8 @@ printf '%s\n' '=== KAIT2EN Audio diagnostic ==='
 printf 'Model: '; cat /sys/class/dmi/id/product_name 2>/dev/null || printf 'unknown\n'
 printf '%s\n' '--- PipeWire sinks ---'
 pactl list sinks short 2>&1 || true
+printf '%s\n' '--- PipeWire quantum ---'
+pw-metadata -n settings 2>&1 | grep -E "clock\.(rate|quantum|min-quantum|force-quantum)" || true
 printf '%s\n' '--- KAIT2EN nodes ---'
 wpctl status 2>&1 | sed -n '/Audio/,$p' | head -80 || true
 printf '%s\n' '--- updater ---'

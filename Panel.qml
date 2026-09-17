@@ -21,7 +21,8 @@ Panel {
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
   property real bassAmount: 3.0
   property bool eqDirty: false
-  readonly property bool isPolishLocale: String(Qt.locale().name).toLowerCase().indexOf("pl") === 0
+  readonly property string systemLocale: String(Qt.locale().name || "").trim().toLowerCase()
+  readonly property bool isPolishLocale: root.systemLocale === "pl" || root.systemLocale.indexOf("pl_") === 0 || root.systemLocale.indexOf("pl-") === 0
   readonly property bool statusRefreshing: statusProcess.running
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
@@ -30,6 +31,7 @@ Panel {
   readonly property string repairScript: String(Qt.resolvedUrl("scripts/repair-duplicate.sh")).replace(/^file:\/\//, "")
   readonly property string bassScript: String(Qt.resolvedUrl("scripts/set-bass.sh")).replace(/^file:\/\//, "")
   readonly property string eqScript: String(Qt.resolvedUrl("eq/apply.sh")).replace(/^file:\/\//, "")
+  readonly property string outputModeScript: String(Qt.resolvedUrl("scripts/set-output-mode.sh")).replace(/^file:\/\//, "")
 
   function tr(polishText, englishText) {
     return root.isPolishLocale ? polishText : englishText
@@ -64,12 +66,8 @@ Panel {
   }
 
   function refresh() {
-    if (statusProcess.running) {
-      statusProcess.running = false
-      Qt.callLater(function() { statusProcess.running = true })
-    } else {
+    if (!statusProcess.running)
       statusProcess.running = true
-    }
   }
 
   function open() {
@@ -98,9 +96,20 @@ Panel {
     eqProcess.running = true
   }
 
+  function setOutputMode(mode) {
+    outputModeProcess.command = [root.outputModeScript, mode]
+    outputModeProcess.running = true
+  }
+
   function value(key, fallback) {
     return root.status && root.status[key] !== undefined ? root.status[key] : fallback
   }
+
+  readonly property color panelForeground: root.bar ? root.bar.foreground : Color.foreground
+  readonly property color cardFill: Qt.alpha(root.panelForeground, 0.06)
+
+  function statusGlyph(ok) { return ok ? "󰄬" : "󰅖" }
+  function statusTone(ok) { return ok ? Color.accent : Color.urgent }
 
   Component.onCompleted: refresh()
 
@@ -108,6 +117,15 @@ Panel {
     onExited: function(code) {
       if (code !== 0) root.statusError = root.tr("Nie udało się zastosować equalizera.", "Could not apply the equalizer.")
       else root.refresh()
+    }
+  }
+
+  property Process outputModeProcess: Process {
+    onExited: function(code) {
+      if (code !== 0)
+        root.statusError = root.tr("Nie udało się zmienić wyjścia audio.", "Could not change the audio output.")
+      else
+        root.refresh()
     }
   }
 
@@ -119,7 +137,7 @@ Panel {
     open: root.opened
     centerOnBar: false
     focusTarget: keyCatcher
-    contentWidth: panel.fittedContentWidth(Style.space(430))
+    contentWidth: panel.fittedContentWidth(Style.space(400))
     contentHeight: panel.fittedContentHeight(contentColumn.implicitHeight + Style.space(24))
 
     PanelKeyCatcher {
@@ -139,7 +157,7 @@ Panel {
     Ui.BorderSurface {
       anchors.fill: parent
       z: 0
-      color: Color.background
+      color: Color.popups.background
       radius: Style.cornerRadius
     }
 
@@ -158,8 +176,8 @@ Panel {
 
         Text {
           id: heroIcon
-          text: "♫"
-          color: root.bar ? root.bar.foreground : Color.foreground
+          text: "󰓃"
+          color: value("dspSink", false) ? Color.accent : Color.urgent
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
           font.pixelSize: Style.font.display
           anchors.left: parent.left
@@ -183,8 +201,10 @@ Panel {
           }
 
           Text {
-            text: root.tr("Natywne audio Apple T2", "Native Apple T2 audio")
-            color: Color.muted
+            text: value("dspSink", false)
+              ? root.tr("DSP aktywny · Apple T2", "DSP active · Apple T2")
+              : root.tr("DSP nieaktywny · Apple T2", "DSP inactive · Apple T2")
+            color: value("dspSink", false) ? Color.accent : Color.urgent
             font.family: root.bar ? root.bar.fontFamily : Style.font.family
             font.pixelSize: Style.font.caption
           }
@@ -201,40 +221,129 @@ Panel {
       Text {
         Layout.fillWidth: true
         text: value("model", root.tr("Wykrywanie modelu Maca…", "Detecting Mac model…")) + "  ·  " + root.tr("profil", "profile") + " " + value("profile", "—")
-        color: root.bar ? root.bar.foreground : Color.foreground
+        color: Color.muted
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
         font.pixelSize: Style.font.body
         elide: Text.ElideRight
       }
 
-      Rectangle {
-        Layout.fillWidth: true
-        implicitHeight: Style.space(1)
-        color: Qt.alpha(root.bar ? root.bar.foreground : Color.foreground, 0.2)
+      Ui.PanelSeparator {
+        foreground: root.bar ? root.bar.foreground : Color.foreground
       }
 
-      Ui.PanelSeparator {
+      Ui.PanelSectionHeader {
         visible: root.page === "status"
+        text: root.tr("SYSTEM", "SYSTEM")
         foreground: root.bar ? root.bar.foreground : Color.foreground
+        fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
       }
 
       GridLayout {
         visible: root.page === "status"
         Layout.fillWidth: true
         columns: 2
-        columnSpacing: Style.space(16)
-        rowSpacing: Style.space(6)
+        columnSpacing: Style.space(8)
+        rowSpacing: Style.space(8)
 
-        Text { text: root.tr("Profil", "Profile"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("profileInstalled", false) ? "󰄬" : "󰅖"; color: value("profileInstalled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: "DSP sink"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("dspSink", false) ? "󰄬" : "󰅖"; color: value("dspSink", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: root.tr("Mikrofon DSP", "DSP microphone"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("dspSource", false) ? "󰄬" : "󰅖"; color: value("dspSource", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: root.tr("Aktualizacje", "Updates"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("timerEnabled", false) ? "󰚰" : "󰅖"; color: value("timerEnabled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: root.tr("Wyjście", "Output"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; elide: Text.ElideRight; Layout.maximumWidth: Style.space(190) }
+        Repeater {
+          model: [
+            { label: root.tr("Profil", "Profile"), detail: root.tr("zainstalowany", "installed"), ok: value("profileInstalled", false) },
+            { label: root.tr("Wyjście DSP", "DSP output"), detail: root.tr("aktywne", "active"), ok: value("dspSink", false) },
+            { label: root.tr("Mikrofon DSP", "DSP microphone"), detail: root.tr("aktywne", "active"), ok: value("dspSource", false) },
+            { label: root.tr("Aktualizacje", "Updates"), detail: root.tr("codziennie", "daily"), ok: value("timerEnabled", false) },
+            { label: root.tr("Bufor PipeWire", "PipeWire buffer"), detail: Number(value("pipewireQuantum", 0)) === 1024 ? "1024 frames" : "check", ok: Number(value("pipewireQuantum", 0)) === 1024 }
+          ]
+
+          delegate: Ui.BorderSurface {
+            required property var modelData
+            Layout.fillWidth: true
+            Layout.preferredHeight: Style.space(48)
+            color: root.cardFill
+            radius: Style.cornerRadius
+            borderSpec: Border.none()
+
+            RowLayout {
+              anchors.fill: parent
+              anchors.leftMargin: Style.space(10)
+              anchors.rightMargin: Style.space(10)
+              spacing: Style.space(9)
+
+              Text {
+                text: root.statusGlyph(modelData.ok)
+                color: root.statusTone(modelData.ok)
+                font.family: root.bar ? root.bar.fontFamily : Style.font.family
+                font.pixelSize: Style.font.title
+              }
+
+              ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                Text { text: modelData.label; color: root.panelForeground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body; elide: Text.ElideRight; Layout.fillWidth: true }
+                Text { text: modelData.detail.toUpperCase(); color: root.statusTone(modelData.ok); font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true; font.letterSpacing: 0.8 }
+              }
+            }
+          }
+        }
+      }
+
+      Ui.BorderSurface {
+        visible: root.page === "status"
+        Layout.fillWidth: true
+        implicitHeight: Style.space(42)
+        color: root.cardFill
+        radius: Style.cornerRadius
+        borderSpec: Border.none()
+
+        RowLayout {
+          anchors.fill: parent
+          anchors.leftMargin: Style.space(10)
+          anchors.rightMargin: Style.space(10)
+          spacing: Style.space(8)
+          Text { text: "󰓃"; color: root.panelForeground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.title }
+          Text { text: root.tr("Domyślne wyjście", "Default output"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption }
+          Item { Layout.fillWidth: true }
+          Text { text: value("defaultSink", "unknown"); color: root.panelForeground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; elide: Text.ElideLeft; Layout.maximumWidth: Style.space(190) }
+        }
+      }
+
+      Ui.PanelSectionHeader {
+        visible: root.page === "status"
+        text: root.tr("TRYB WYJŚCIA", "OUTPUT MODE")
+        foreground: root.panelForeground
+        fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
+      }
+
+      RowLayout {
+        visible: root.page === "status"
+        Layout.fillWidth: true
+        spacing: Style.space(6)
+        Ui.Button {
+          text: root.tr("KaiT2en DSP", "KaiT2en DSP")
+          iconText: "󰓃"
+          active: value("outputMode", "") === "dsp"
+          enabled: !outputModeProcess.running
+          onClicked: root.setOutputMode("dsp")
+        }
+        Ui.Button {
+          text: root.tr("Natywne", "Native")
+          iconText: "󰍹"
+          active: value("outputMode", "") === "native"
+          enabled: !outputModeProcess.running
+          onClicked: root.setOutputMode("native")
+        }
+        Item { Layout.fillWidth: true }
+      }
+
+      RowLayout {
+        visible: root.page === "status"
+        Layout.fillWidth: true
+        spacing: Style.space(8)
+        Ui.PanelSectionHeader {
+          text: root.tr("DOSTRAJANIE", "TUNING")
+          foreground: root.bar ? root.bar.foreground : Color.foreground
+          fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
+        }
+        Item { Layout.fillWidth: true }
       }
 
       RowLayout {
@@ -267,8 +376,15 @@ Panel {
         Layout.fillWidth: true
         spacing: Style.space(5)
 
+        Ui.PanelSeparator { foreground: root.bar ? root.bar.foreground : Color.foreground }
+        Ui.PanelSectionHeader {
+          text: root.tr("EQUALIZER UŻYTKOWNIKA", "USER EQUALIZER")
+          foreground: root.bar ? root.bar.foreground : Color.foreground
+          fontFamily: root.bar ? root.bar.fontFamily : Style.font.family
+        }
+
         Text {
-          text: root.tr("Equalizer użytkownika (±6 dB)", "User Equalizer (±6 dB)")
+          text: root.tr("8 pasm · zakres ±6 dB", "8 bands · ±6 dB range")
           color: root.bar ? root.bar.foreground : Color.foreground
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
           font.bold: true
@@ -300,8 +416,8 @@ Panel {
         RowLayout {
           Layout.fillWidth: true
           spacing: Style.space(6)
-          Ui.Button { text: "ZASTOSUJ EQ"; onClicked: root.applyEq() }
-          Ui.Button { text: "WYŁĄCZ EQ"; onClicked: root.disableEq() }
+          Ui.Button { text: root.tr("ZASTOSUJ", "APPLY"); onClicked: root.applyEq() }
+          Ui.Button { text: root.tr("WYŁĄCZ", "DISABLE"); onClicked: root.disableEq() }
           Ui.Button { text: "FLAT"; onClicked: { root.eqGains = [0,0,0,0,0,0,0,0]; root.applyEq() } }
         }
 
@@ -330,7 +446,7 @@ Panel {
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(6)
-        Ui.Button { text: root.statusRefreshing ? root.tr("ODŚWIEŻANIE…", "REFRESHING…") : root.tr("ODŚWIEŻ", "REFRESH"); onClicked: root.refresh() }
+        Ui.Button { text: root.tr("ODŚWIEŻ", "REFRESH"); iconText: "󰑐"; iconSpinning: root.statusRefreshing; enabled: !root.statusRefreshing; Layout.preferredWidth: Style.space(96); onClicked: root.refresh() }
         Ui.Button { text: root.tr("DIAGNOSTYKA", "DIAGNOSTICS"); onClicked: Quickshell.execDetached(["alacritty", "--class", "TUI.float", "-e", root.diagnoseScript]) }
       }
 

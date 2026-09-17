@@ -73,6 +73,12 @@ profiles are activated only for the matching UCM Speaker/Mic nodes; headphones
 and headset microphones remain untouched. Reboot after the first installation
 so the udev card-id rule can take effect cleanly.
 
+On supported T2 Macs the installer also applies a dedicated PipeWire stability
+override using a 1024-frame quantum. This prevents recurring ALSA underruns that
+can cause clicks or short dropouts on the internal speakers. The panel and
+diagnostic command report the active quantum, and the uninstaller removes only
+the override owned by KAIT2EN.
+
 The plugin also includes a repair action for the known failure mode where a
 user-local Bankstown checkout duplicates the system LV2 plugin.
 
