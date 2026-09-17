@@ -127,10 +127,24 @@ Panel {
       }
     }
 
+    // Keep the panel legible on bright wallpapers. The stock audio panel gets
+    // its surface from KeyboardPanel; this inner surface makes the custom
+    // controls equally readable when a theme intentionally uses translucent
+    // popup colors.
+    Ui.BorderSurface {
+      anchors.fill: parent
+      z: 0
+      color: Color.background
+      radius: Style.cornerRadius
+    }
+
     ColumnLayout {
       id: contentColumn
-      anchors.fill: parent
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
       anchors.margins: Style.space(18)
+      z: 1
       spacing: Style.space(10)
 
       Item {
