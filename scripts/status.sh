@@ -11,23 +11,23 @@ json_escape() {
 
 model=$(cat /sys/class/dmi/id/product_name 2>/dev/null || printf 'unknown')
 case "$model" in
-  MacBookAir8,1) profile=8_1 ;;
-  MacBookAir8,2) profile=8_2 ;;
-  MacBookAir9,1) profile=9_1 ;;
-  MacBookPro15,1) profile=15_1 ;;
-  MacBookPro15,2) profile=15_2 ;;
-  MacBookPro15,3) profile=15_3 ;;
-  MacBookPro15,4) profile=15_4 ;;
-  MacBookPro16,1) profile=16_1 ;;
-  MacBookPro16,2) profile=16_2 ;;
-  MacBookPro16,3) profile=16_3 ;;
-  MacBookPro16,4) profile=16_4 ;;
+  MacBookAir8,1) profile=8_1; dsp_name=81 ;;
+  MacBookAir8,2) profile=8_2; dsp_name=82 ;;
+  MacBookAir9,1) profile=9_1; dsp_name=91 ;;
+  MacBookPro15,1) profile=15_1; dsp_name=151 ;;
+  MacBookPro15,2) profile=15_2; dsp_name=152 ;;
+  MacBookPro15,3) profile=15_3; dsp_name=153 ;;
+  MacBookPro15,4) profile=15_4; dsp_name=154 ;;
+  MacBookPro16,1) profile=16_1; dsp_name=161 ;;
+  MacBookPro16,2) profile=16_2; dsp_name=162 ;;
+  MacBookPro16,3) profile=16_3; dsp_name=163 ;;
+  MacBookPro16,4) profile=16_4; dsp_name=164 ;;
   *) profile=unsupported ;;
 esac
 
 sink=$(pactl info 2>/dev/null | sed -n 's/^Default Sink: //p')
 [[ -n "$sink" ]] || sink=unknown
-if pactl list sinks short 2>/dev/null | awk '{print $2}' | grep -Fxq audio_effect.t2-81-speakers; then
+if pactl list sinks short 2>/dev/null | awk '{print $2}' | grep -Fxq "audio_effect.t2-${dsp_name:-unsupported}-speakers"; then
   dsp_sink=true
 else
   dsp_sink=false
