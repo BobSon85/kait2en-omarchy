@@ -21,6 +21,7 @@ Panel {
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
   property real bassAmount: 3.0
   property bool eqDirty: false
+  readonly property bool polish: String(Qt.locale().name).toLowerCase().indexOf("pl") === 0
   readonly property bool statusRefreshing: statusProcess.running
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
@@ -29,6 +30,10 @@ Panel {
   readonly property string repairScript: String(Qt.resolvedUrl("scripts/repair-duplicate.sh")).replace(/^file:\/\//, "")
   readonly property string bassScript: String(Qt.resolvedUrl("scripts/set-bass.sh")).replace(/^file:\/\//, "")
   readonly property string eqScript: String(Qt.resolvedUrl("eq/apply.sh")).replace(/^file:\/\//, "")
+
+  function tr(polishText, englishText) {
+    return root.polish ? polishText : englishText
+  }
 
   property Process statusProcess: Process {
     command: [root.statusScript]
@@ -43,10 +48,10 @@ Panel {
             root.eqGains = root.status.eqGains
           root.statusError = ""
         } catch (error) {
-          root.statusError = "Invalid status response"
+          root.statusError = root.tr("Nieprawidłowa odpowiedź statusu", "Invalid status response")
         }
       } else {
-        root.statusError = statusErrors.text || "Could not read KAIT2EN status"
+        root.statusError = statusErrors.text || root.tr("Nie można odczytać statusu KAIT2EN", "Could not read KAIT2EN status")
       }
     }
   }
@@ -101,7 +106,7 @@ Panel {
 
   property Process eqProcess: Process {
     onExited: function(code) {
-      if (code !== 0) root.statusError = "Nie udało się zastosować equalizera."
+      if (code !== 0) root.statusError = root.tr("Nie udało się zastosować equalizera.", "Could not apply the equalizer.")
       else root.refresh()
     }
   }
@@ -178,7 +183,7 @@ Panel {
           }
 
           Text {
-            text: "Native Apple T2 audio"
+            text: root.tr("Natywne audio Apple T2", "Native Apple T2 audio")
             color: Color.muted
             font.family: root.bar ? root.bar.fontFamily : Style.font.family
             font.pixelSize: Style.font.caption
@@ -189,13 +194,13 @@ Panel {
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(6)
-        Ui.Button { text: "STATUS"; active: root.page === "status"; onClicked: root.page = "status" }
-        Ui.Button { text: "EQUALIZER"; active: root.page === "eq"; onClicked: root.page = "eq" }
+        Ui.Button { text: root.tr("STATUS", "STATUS"); active: root.page === "status"; onClicked: root.page = "status" }
+        Ui.Button { text: root.tr("EQUALIZER", "EQUALIZER"); active: root.page === "eq"; onClicked: root.page = "eq" }
       }
 
       Text {
         Layout.fillWidth: true
-        text: value("model", "Detecting Mac model…") + "  ·  profile " + value("profile", "—")
+        text: value("model", root.tr("Wykrywanie modelu Maca…", "Detecting Mac model…")) + "  ·  " + root.tr("profil", "profile") + " " + value("profile", "—")
         color: root.bar ? root.bar.foreground : Color.foreground
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
         font.pixelSize: Style.font.body
@@ -220,22 +225,22 @@ Panel {
         columnSpacing: Style.space(16)
         rowSpacing: Style.space(6)
 
-        Text { text: "Profil"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: root.tr("Profil", "Profile"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("profileInstalled", false) ? "󰄬" : "󰅖"; color: value("profileInstalled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: "Sink DSP"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: "DSP sink"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("dspSink", false) ? "󰄬" : "󰅖"; color: value("dspSink", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: "Mikrofon DSP"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: root.tr("Mikrofon DSP", "DSP microphone"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("dspSource", false) ? "󰄬" : "󰅖"; color: value("dspSource", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: "Aktualizacje"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: root.tr("Aktualizacje", "Updates"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("timerEnabled", false) ? "󰚰" : "󰅖"; color: value("timerEnabled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
-        Text { text: "Wyjście"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: root.tr("Wyjście", "Output"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; elide: Text.ElideRight; Layout.maximumWidth: Style.space(190) }
       }
 
       RowLayout {
         visible: root.page === "status"
         Layout.fillWidth: true
-        Text { text: "VIRTUAL BASS"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true }
+        Text { text: root.tr("BAS WIRTUALNY", "VIRTUAL BASS"); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true }
         Ui.PanelSlider {
           id: bassSlider
           bar: root.bar
@@ -245,13 +250,13 @@ Panel {
           onMoved: function(v) { root.bassAmount = v }
         }
         Text { text: Number(root.bassAmount).toFixed(1); Layout.preferredWidth: Style.space(34); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Ui.Button { text: "ZASTOSUJ"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.bassScript, Number(root.bassAmount).toFixed(1)]) }
+        Ui.Button { text: root.tr("ZASTOSUJ", "APPLY"); onClicked: Quickshell.execDetached(["alacritty", "-e", root.bassScript, Number(root.bassAmount).toFixed(1)]) }
       }
 
       Text {
         visible: root.page === "status" && value("duplicateBankstown", false)
         Layout.fillWidth: true
-        text: "Uwaga: wykryto duplikat Bankstown w ~/.lv2 i /usr/lib/lv2."
+        text: root.tr("Uwaga: wykryto duplikat Bankstown w ~/.lv2 i /usr/lib/lv2.", "Warning: duplicate Bankstown detected in ~/.lv2 and /usr/lib/lv2.")
         wrapMode: Text.WordWrap
         color: Color.urgent
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -263,7 +268,7 @@ Panel {
         spacing: Style.space(5)
 
         Text {
-          text: "User Equalizer (±6 dB)"
+          text: root.tr("Equalizer użytkownika (±6 dB)", "User Equalizer (±6 dB)")
           color: root.bar ? root.bar.foreground : Color.foreground
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
           font.bold: true
@@ -302,7 +307,7 @@ Panel {
 
         Text {
           Layout.fillWidth: true
-          text: "EQ jest osobną warstwą za profilem KAIT2EN i nie zmienia plików upstreamu."
+          text: root.tr("EQ jest osobną warstwą za profilem KAIT2EN i nie zmienia plików upstream.", "EQ is a separate layer after the KAIT2EN profile and does not modify upstream files.")
           wrapMode: Text.WordWrap
           color: Color.muted
           font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -325,16 +330,16 @@ Panel {
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(6)
-        Ui.Button { text: root.statusRefreshing ? "ODŚWIEŻANIE…" : "ODŚWIEŻ"; onClicked: root.refresh() }
-        Ui.Button { text: "DIAGNOSTYKA"; onClicked: Quickshell.execDetached(["alacritty", "--class", "TUI.float", "-e", root.diagnoseScript]) }
+        Ui.Button { text: root.statusRefreshing ? root.tr("ODŚWIEŻANIE…", "REFRESHING…") : root.tr("ODŚWIEŻ", "REFRESH"); onClicked: root.refresh() }
+        Ui.Button { text: root.tr("DIAGNOSTYKA", "DIAGNOSTICS"); onClicked: Quickshell.execDetached(["alacritty", "--class", "TUI.float", "-e", root.diagnoseScript]) }
       }
 
       RowLayout {
         visible: root.page === "status"
         Layout.fillWidth: true
         spacing: Style.space(6)
-        Ui.Button { text: "INSTALUJ / NAPRAW"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.installScript]) }
-        Ui.Button { text: "NAPRAW BANKSTOWN"; visible: value("duplicateBankstown", false); onClicked: Quickshell.execDetached(["alacritty", "-e", root.repairScript]) }
+        Ui.Button { text: root.tr("INSTALUJ / NAPRAW", "INSTALL / REPAIR"); onClicked: Quickshell.execDetached(["alacritty", "-e", root.installScript]) }
+        Ui.Button { text: root.tr("NAPRAW BANKSTOWN", "REPAIR BANKSTOWN"); visible: value("duplicateBankstown", false); onClicked: Quickshell.execDetached(["alacritty", "-e", root.repairScript]) }
       }
     }
   }

@@ -16,7 +16,11 @@ printf '%s\n' '--- recent WirePlumber errors ---'
 journalctl --user -b --no-pager -u wireplumber -p warning..err 2>&1 \
   | grep -v -E 'Failed to get percentage from UPower|org.freedesktop.DBus.Error.NameHasNoOwner' \
   | tail -40 || true
-printf '%s\n' '' 'Naciśnij Q, aby zamknąć to okno.'
+if [[ "${LANG:-}" == pl_* || "${LC_ALL:-}" == pl_* || "${LC_MESSAGES:-}" == pl_* ]]; then
+  printf '%s\n' '' 'Naciśnij Q, aby zamknąć to okno.'
+else
+  printf '%s\n' '' 'Press Q to close this window.'
+fi
 while IFS= read -r -n 1 key; do
   [[ "$key" == "q" || "$key" == "Q" ]] && break
 done

@@ -85,6 +85,13 @@ The panel exposes both the optional 8-band user EQ and the KAIT2EN
 virtual-bass amount. The latter is stored separately from upstream graphs and
 reapplied by the system updater after a profile update.
 
+## Languages
+
+The panel supports English and Polish. English is the default for all other
+locales; Polish is selected automatically when the desktop locale starts with
+`pl_`. Diagnostic output follows the same locale where it provides its own
+messages.
+
 ## Development
 
 Install it with the repository URL:
