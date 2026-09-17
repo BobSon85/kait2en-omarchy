@@ -18,9 +18,23 @@ stage rather than alter the upstream KAIT2EN profile.
 ## Supported hardware
 
 The installer reads the DMI product name and follows the profile mapping from
-the KAIT2EN source. It currently covers the upstream Apple T2 speaker profiles
-for MacBookAir8,1/8,2, MacBookAir9,1, MacBookPro15,1–15,4 and
-MacBookPro16,1–16,4. Unknown models are rejected before any privileged action.
+the KAIT2EN source. The supported MacBook matrix is:
+
+| MacBook | KAIT2EN profile |
+| --- | --- |
+| Air 2018 | `MacBookAir8,1` → `8_1` |
+| Air 2019 | `MacBookAir8,2` → `8_2` |
+| Air 2020 Intel | `MacBookAir9,1` → `9_1` |
+| Pro 15-inch 2018/2019 | `MacBookPro15,1` → `15_1` |
+| Pro 13-inch 2018/2019, 4 Thunderbolt ports | `MacBookPro15,2` → `15_2` |
+| Pro 15-inch with Radeon Pro Vega | `MacBookPro15,3` → `15_3` |
+| Pro 13-inch 2019, 2 Thunderbolt ports | `MacBookPro15,4` → `15_4` |
+| Pro 16-inch 2019 | `MacBookPro16,1` → `16_1` |
+| Pro 13-inch 2020, 4 Thunderbolt ports | `MacBookPro16,2` → `16_2` |
+| Pro 13-inch 2020, 2 Thunderbolt ports | `MacBookPro16,3` → `16_3` |
+| Pro 16-inch 2019 | `MacBookPro16,4` → `16_4` |
+
+Unknown models are rejected before any privileged action.
 
 ## System integration
 
