@@ -71,7 +71,7 @@ reapplied by the system updater after a profile update.
 Install it with the repository URL:
 
 ```sh
-omarchy plugin add https://github.com/USER/REPOSITORY.git --enable
+omarchy plugin add https://github.com/BobSon85/kait2en-omarchy.git --enable
 ```
 
 Open the KaiT2en Audio widget and choose `Instaluj / napraw` to install the

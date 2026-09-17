@@ -7,8 +7,7 @@ plugin and does not contain credentials.
 
 - Category: `Hardware`
 - Tags: `quickshell`, `system`, `media`
-- Repository: replace the placeholder in `README.md` with the final public
-  GitHub URL before submitting.
+- Repository: https://github.com/BobSon85/kait2en-omarchy
 
 ## Before submission
 
