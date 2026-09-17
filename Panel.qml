@@ -100,14 +100,6 @@ Panel {
     }
   }
 
-  IpcHandler {
-    target: "kait2en.audio"
-    function open(): void { root.open() }
-    function close(): void { root.close() }
-    function toggle(): void { root.toggle() }
-    function refresh(): void { root.refresh() }
-  }
-
   KeyboardPanel {
     id: panel
     anchorItem: root.anchorItem
