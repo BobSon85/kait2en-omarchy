@@ -11,16 +11,12 @@ BarWidget {
 
   readonly property bool opened: panelItem ? panelItem.opened === true : false
   readonly property var sink: Pipewire.defaultAudioSink
-  readonly property real outputVolume: sink && sink.audio ? sink.audio.volume : 0
   readonly property bool outputMuted: sink && sink.audio ? sink.audio.muted : false
+  readonly property bool dspActive: panelItem && panelItem.status && panelItem.status.dspSink !== undefined
+    ? panelItem.status.dspSink === true
+    : !!sink
+  readonly property bool iconInactive: !root.dspActive || root.outputMuted
   property var panelItem: null
-
-  function audioIcon() {
-    if (root.outputMuted) return "󰝟"
-    if (root.outputVolume <= 0.33) return "󰖀"
-    if (root.outputVolume <= 0.66) return "󰕿"
-    return "󰕾"
-  }
 
   function injectPanel() {
     var target = panelLoader.item
@@ -65,7 +61,10 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: root.audioIcon()
+    text: "󰓃"
+    foreground: "#FFFFFF"
+    active: root.iconInactive
+    activeColor: Color.urgent
     tooltipText: root.opened ? "Close KaiT2en Audio" : "KaiT2en Audio"
     onPressed: function(b) {
       if (b === Qt.LeftButton) root.togglePanel()

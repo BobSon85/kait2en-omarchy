@@ -13,8 +13,8 @@ not run plugin install hooks or `sudo` commands.
 
 The user equalizer is an optional separate PipeWire stage. `Flat` is a safe,
 zero-change setting and disabling it removes the user stage rather than
-altering the upstream KAIT2EN profile. The bar icon follows the current output
-volume and mute state.
+altering the upstream KAIT2EN profile. The bar uses a fixed technical DSP icon:
+white means the DSP output is active, while red means it is inactive or muted.
 
 ## Supported hardware
 
