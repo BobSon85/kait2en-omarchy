@@ -12,6 +12,10 @@ carry the attribution requirement described in that repository's
 `LICENSING.md`. The copyright attribution is retained in the installed profile
 README files.
 
+The repository also supplies the Apple T2 ALSA UCM tree under
+`modules/t2bce_audio-alsa-ucm-conf`. It is installed from that upstream
+checkout during setup; its source license and attribution remain authoritative.
+
 ## Bankstown
 
 Repository: https://github.com/chadmed/bankstown
