@@ -57,3 +57,6 @@ never touch unsupported Macs.
 
 Plugin code is GPL-3.0-or-later. KAIT2EN and third-party component notices will
 be documented before publication.
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the attribution and
+license handling of the downloaded components.
