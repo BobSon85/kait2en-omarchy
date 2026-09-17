@@ -1,10 +1,10 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import qs.Ui as Ui
 
 Panel {
   id: root
@@ -133,18 +133,50 @@ Panel {
       anchors.margins: Style.space(18)
       spacing: Style.space(10)
 
-      Text {
-        text: "KaiT2en Audio DSP"
-        color: root.bar ? root.bar.foreground : Color.foreground
-        font.family: root.bar ? root.bar.fontFamily : Style.font.family
-        font.pixelSize: Style.font.title
-        font.bold: true
+      Item {
+        Layout.fillWidth: true
+        implicitHeight: Math.max(heroIcon.implicitHeight, heroTitle.implicitHeight)
+
+        Text {
+          id: heroIcon
+          text: "♫"
+          color: root.bar ? root.bar.foreground : Color.foreground
+          font.family: root.bar ? root.bar.fontFamily : Style.font.family
+          font.pixelSize: Style.font.display
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Column {
+          id: heroTitle
+          anchors.left: heroIcon.right
+          anchors.leftMargin: Style.space(14)
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+          spacing: Style.space(2)
+
+          Text {
+            text: "KaiT2en Audio DSP"
+            color: root.bar ? root.bar.foreground : Color.foreground
+            font.family: root.bar ? root.bar.fontFamily : Style.font.family
+            font.pixelSize: Style.font.title
+            font.bold: true
+          }
+
+          Text {
+            text: "Native Apple T2 audio"
+            color: Color.muted
+            font.family: root.bar ? root.bar.fontFamily : Style.font.family
+            font.pixelSize: Style.font.caption
+          }
+        }
       }
 
       RowLayout {
         Layout.fillWidth: true
-        Button { text: "Status"; onClicked: root.page = "status" }
-        Button { text: "Equalizer"; onClicked: root.page = "eq" }
+        spacing: Style.space(6)
+        Ui.Button { text: "STATUS"; active: root.page === "status"; onClicked: root.page = "status" }
+        Ui.Button { text: "EQUALIZER"; active: root.page === "eq"; onClicked: root.page = "eq" }
       }
 
       Text {
@@ -160,6 +192,11 @@ Panel {
         Layout.fillWidth: true
         implicitHeight: Style.space(1)
         color: Qt.alpha(root.bar ? root.bar.foreground : Color.foreground, 0.2)
+      }
+
+      Ui.PanelSeparator {
+        visible: root.page === "status"
+        foreground: root.bar ? root.bar.foreground : Color.foreground
       }
 
       GridLayout {
@@ -184,15 +221,17 @@ Panel {
       RowLayout {
         visible: root.page === "status"
         Layout.fillWidth: true
-        Text { text: "KAIT2EN bass"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Slider {
+        Text { text: "VIRTUAL BASS"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true }
+        Ui.PanelSlider {
+          id: bassSlider
+          bar: root.bar
           Layout.fillWidth: true
-          from: 0; to: 8; stepSize: 0.5
+          minimum: 0; maximum: 8; step: 0.5
           value: root.bassAmount
-          onMoved: root.bassAmount = value
+          onMoved: function(v) { root.bassAmount = v }
         }
         Text { text: Number(root.bassAmount).toFixed(1); Layout.preferredWidth: Style.space(34); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Button { text: "Zastosuj"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.bassScript, Number(root.bassAmount).toFixed(1)]) }
+        Ui.Button { text: "ZASTOSUJ"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.bassScript, Number(root.bassAmount).toFixed(1)]) }
       }
 
       Text {
@@ -222,13 +261,14 @@ Panel {
             required property string modelData
             Layout.fillWidth: true
             Text { text: modelData + " Hz"; Layout.preferredWidth: Style.space(55); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-            Slider {
+            Ui.PanelSlider {
+              bar: root.bar
               Layout.fillWidth: true
-              from: -6; to: 6; stepSize: 0.5
+              minimum: -6; maximum: 6; step: 0.5
               value: root.eqGains[index]
-              onMoved: {
+              onMoved: function(v) {
                 var updated = root.eqGains.slice()
-                updated[index] = value
+                updated[index] = v
                 root.eqGains = updated
                 root.eqDirty = true
               }
@@ -239,9 +279,10 @@ Panel {
 
         RowLayout {
           Layout.fillWidth: true
-          Button { text: "Zastosuj EQ"; onClicked: root.applyEq() }
-          Button { text: "Wyłącz EQ"; onClicked: root.disableEq() }
-          Button { text: "Flat"; onClicked: { root.eqGains = [0,0,0,0,0,0,0,0]; root.applyEq() } }
+          spacing: Style.space(6)
+          Ui.Button { text: "ZASTOSUJ EQ"; onClicked: root.applyEq() }
+          Ui.Button { text: "WYŁĄCZ EQ"; onClicked: root.disableEq() }
+          Ui.Button { text: "FLAT"; onClicked: { root.eqGains = [0,0,0,0,0,0,0,0]; root.applyEq() } }
         }
 
         Text {
@@ -262,19 +303,24 @@ Panel {
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
       }
 
-        RowLayout {
-          Layout.fillWidth: true
-          spacing: Style.space(8)
-          Button { text: "Odśwież"; onClicked: root.refresh() }
-          Button { text: "Diagnostyka"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.diagnoseScript]) }
-        }
+      Ui.PanelSeparator {
+        foreground: root.bar ? root.bar.foreground : Color.foreground
+      }
 
-        RowLayout {
-          visible: root.page === "status"
-          Layout.fillWidth: true
-          Button { text: "Instaluj / napraw"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.installScript]) }
-          Button { text: "Napraw Bankstown"; visible: value("duplicateBankstown", false); onClicked: Quickshell.execDetached(["alacritty", "-e", root.repairScript]) }
-        }
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: Style.space(6)
+        Ui.Button { text: "ODŚWIEŻ"; onClicked: root.refresh() }
+        Ui.Button { text: "DIAGNOSTYKA"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.diagnoseScript]) }
+      }
+
+      RowLayout {
+        visible: root.page === "status"
+        Layout.fillWidth: true
+        spacing: Style.space(6)
+        Ui.Button { text: "INSTALUJ / NAPRAW"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.installScript]) }
+        Ui.Button { text: "NAPRAW BANKSTOWN"; visible: value("duplicateBankstown", false); onClicked: Quickshell.execDetached(["alacritty", "-e", root.repairScript]) }
+      }
     }
   }
 }
