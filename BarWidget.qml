@@ -52,7 +52,7 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: "♫"
+    text: "󰓃"
     tooltipText: root.opened ? "Close KaiT2en Audio" : "KaiT2en Audio"
     onPressed: function(b) {
       if (b === Qt.LeftButton) root.togglePanel()
