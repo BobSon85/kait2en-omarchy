@@ -170,11 +170,11 @@ Panel {
         rowSpacing: Style.space(6)
 
         Text { text: "Profil"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("profileInstalled", false) ? "zainstalowany" : "brak"; color: value("profileInstalled", false) ? Color.success : Color.warning; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: value("profileInstalled", false) ? "zainstalowany" : "brak"; color: value("profileInstalled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Sink DSP"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("dspSink", false) ? "aktywny" : "nieaktywny"; color: value("dspSink", false) ? Color.success : Color.warning; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: value("dspSink", false) ? "aktywny" : "nieaktywny"; color: value("dspSink", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Aktualizacje"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("timerEnabled", false) ? "timer aktywny" : "timer wyłączony"; color: value("timerEnabled", false) ? Color.success : Color.warning; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: value("timerEnabled", false) ? "timer aktywny" : "timer wyłączony"; color: value("timerEnabled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Wyjście"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; elide: Text.ElideRight; Layout.maximumWidth: Style.space(260) }
       }
@@ -198,7 +198,7 @@ Panel {
         Layout.fillWidth: true
         text: "Uwaga: wykryto duplikat Bankstown w ~/.lv2 i /usr/lib/lv2."
         wrapMode: Text.WordWrap
-        color: Color.warning
+        color: Color.urgent
         font.family: root.bar ? root.bar.fontFamily : Style.font.family
       }
 
