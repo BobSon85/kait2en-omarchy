@@ -7,6 +7,17 @@ BANK="$BASE/bankstown"
 MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
 SETTINGS=/etc/kait2en-omarchy/settings.conf
 
+restart_logged_in_wireplumber() {
+  local user uid runtime bus
+  user=$(loginctl list-users --no-legend 2>/dev/null | awk '$1 >= 1000 { print $2; exit }' || true)
+  [[ -n "$user" ]] || return 0
+  uid=$(id -u "$user")
+  runtime="/run/user/$uid"
+  bus="unix:path=$runtime/bus"
+  runuser -u "$user" -- env XDG_RUNTIME_DIR="$runtime" DBUS_SESSION_BUS_ADDRESS="$bus" \
+    systemctl --user restart wireplumber || true
+}
+
 profile_for_model() {
   case "$1" in
     MacBookAir8,1) printf '8_1' ;; MacBookAir8,2) printf '8_2' ;;
@@ -73,6 +84,19 @@ if [[ -d /usr/share/t2-dsp/profiles ]]; then
   mv /usr/share/t2-dsp/profiles "$BASE/backups/$STAMP-profiles"
 fi
 cp -a "$REPO/dsp/build/profiles" /usr/share/t2-dsp/
+# Older T2 kernels expose the BCE card as "Audio". Newer upstream setups use
+# the model-specific t2-* ALSA id. Patch only the active profile to the live
+# card id; all other profiles retain upstream's portable t2-* target.
+card_id="t2-$PROFILE"
+for id_file in /sys/class/sound/card*/id; do
+  [[ -r "$id_file" ]] || continue
+  if [[ $(<"$id_file") == Audio ]]; then
+    card_id=Audio
+    break
+  fi
+done
+sed -Ei "s#alsa_output\.hw_t2-${PROFILE}_0#alsa_output.hw_${card_id}_0#g" \
+  "/usr/share/t2-dsp/profiles/$PROFILE/graph.json"
 sed -Ei "0,/\"amt\"[[:space:]]*:[[:space:]]*[0-9.]+/s//\"amt\": $BASS_AMT/" \
   "/usr/share/t2-dsp/profiles/$PROFILE/graph.json"
 if [[ -d /usr/lib/lv2/bankstown.lv2 ]]; then
@@ -81,6 +105,9 @@ if [[ -d /usr/lib/lv2/bankstown.lv2 ]]; then
 fi
 install -m 0755 "$BANK/target/release/libbankstown.so" /usr/lib/lv2/bankstown.lv2/bankstown.so
 install -m 0644 "$BANK/bankstown.ttl" "$BANK/manifest.ttl" /usr/lib/lv2/bankstown.lv2/
+install -d /usr/lib/udev/rules.d
+install -m 0644 "$REPO/dsp/build/89-t2-dsp.rules" /usr/lib/udev/rules.d/89-kait2en-dsp.rules
+udevadm control --reload-rules || true
 
 cat > /usr/share/wireplumber/wireplumber.conf.d/51-kait2en-dsp.conf <<EOF
 node.software-dsp.rules = [
@@ -98,4 +125,5 @@ EOF
 
 printf '%s\n' "$REV" > "$BASE/installed-rev"
 printf '%s\n' "$BASS_AMT" > "$BASE/installed-bass"
+restart_logged_in_wireplumber
 echo "KAIT2EN: installed $MODEL ($PROFILE), revision $REV, bass amount $BASS_AMT"
