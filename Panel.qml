@@ -21,6 +21,7 @@ Panel {
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
   property real bassAmount: 3.0
   property bool eqDirty: false
+  readonly property bool statusRefreshing: statusProcess.running
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
   readonly property string diagnoseScript: String(Qt.resolvedUrl("scripts/diagnose.sh")).replace(/^file:\/\//, "")
@@ -58,7 +59,12 @@ Panel {
   }
 
   function refresh() {
-    if (!statusProcess.running) statusProcess.running = true
+    if (statusProcess.running) {
+      statusProcess.running = false
+      Qt.callLater(function() { statusProcess.running = true })
+    } else {
+      statusProcess.running = true
+    }
   }
 
   function open() {
@@ -319,7 +325,7 @@ Panel {
       RowLayout {
         Layout.fillWidth: true
         spacing: Style.space(6)
-        Ui.Button { text: "ODŚWIEŻ"; onClicked: root.refresh() }
+        Ui.Button { text: root.statusRefreshing ? "ODŚWIEŻANIE…" : "ODŚWIEŻ"; onClicked: root.refresh() }
         Ui.Button { text: "DIAGNOSTYKA"; onClicked: Quickshell.execDetached(["alacritty", "--class", "TUI.float", "-e", root.diagnoseScript]) }
       }
 
