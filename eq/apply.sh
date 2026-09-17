@@ -6,6 +6,10 @@ CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/wireplumber/wireplumber.conf.d"
 CONF="$CONF_DIR/70-kait2en-user-eq.conf"
 mkdir -p "$STATE_DIR" "$CONF_DIR"
 
+restart_wireplumber() {
+  [[ "${KAIT2EN_SKIP_RESTART:-0}" == 1 ]] || systemctl --user restart wireplumber
+}
+
 enabled=${1:-0}; shift || true
 freqs=(60 120 250 500 1000 2000 4000 8000)
 (( $# == 8 )) || { echo 'usage: apply.sh <0|1> <8 gains in dB>' >&2; exit 2; }
@@ -34,7 +38,7 @@ done
 
 if [[ "$enabled" != 1 ]]; then
   rm -f "$CONF" "$STATE_DIR/eq.state"
-  systemctl --user restart wireplumber
+  restart_wireplumber
   exit 0
 fi
 
@@ -70,5 +74,5 @@ fi
   printf '%s\n' 'wireplumber.profiles = { main = { filter.sink.kait2en-user-eq = required } }'
 } > "$CONF"
 printf '%s\n' "$*" > "$STATE_DIR/eq.state"
-systemctl --user restart wireplumber
+restart_wireplumber
 echo "Applied KaiT2en user EQ for $model"

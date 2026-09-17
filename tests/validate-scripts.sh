@@ -5,4 +5,5 @@ for file in "$ROOT/scripts/status.sh" "$ROOT/scripts/diagnose.sh" "$ROOT/scripts
   bash -n "$file"
 done
 omarchy plugin validate "$ROOT"
+"$ROOT/tests/test-eq.sh"
 printf '%s\n' 'plugin manifest and shell scripts: OK'
