@@ -1,0 +1,15 @@
+name: Validate plugin
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON manifest
+        run: python3 -m json.tool manifest.json >/dev/null
+      - name: Validate shell scripts
+        run: bash tests/validate-ci.sh

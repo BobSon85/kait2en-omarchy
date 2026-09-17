@@ -14,7 +14,7 @@
   "barWidget": {
     "displayName": "KaiT2en Audio",
     "description": "Show KAIT2EN DSP status and configure Apple T2 audio.",
-    "category": "Audio",
+    "category": "System",
     "allowMultiple": false,
     "defaultSection": "right",
     "defaults": {

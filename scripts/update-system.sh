@@ -69,11 +69,16 @@ STAMP=$(date +%Y%m%d-%H%M%S)
 [[ -d /usr/lib/lv2/bankstown.lv2 ]] && cp -a /usr/lib/lv2/bankstown.lv2 "$BASE/backups/$STAMP-bankstown"
 
 install -d /usr/share/t2-dsp/profiles /usr/lib/lv2/bankstown.lv2 /usr/share/wireplumber/wireplumber.conf.d
-rm -rf /usr/share/t2-dsp/profiles
+if [[ -d /usr/share/t2-dsp/profiles ]]; then
+  mv /usr/share/t2-dsp/profiles "$BASE/backups/$STAMP-profiles"
+fi
 cp -a "$REPO/dsp/build/profiles" /usr/share/t2-dsp/
 sed -Ei "0,/\"amt\"[[:space:]]*:[[:space:]]*[0-9.]+/s//\"amt\": $BASS_AMT/" \
   "/usr/share/t2-dsp/profiles/$PROFILE/graph.json"
-rm -rf /usr/lib/lv2/bankstown.lv2
+if [[ -d /usr/lib/lv2/bankstown.lv2 ]]; then
+  mv /usr/lib/lv2/bankstown.lv2 "$BASE/backups/$STAMP-bankstown-lv2"
+  install -d /usr/lib/lv2/bankstown.lv2
+fi
 install -m 0755 "$BANK/target/release/libbankstown.so" /usr/lib/lv2/bankstown.lv2/bankstown.so
 install -m 0644 "$BANK/bankstown.ttl" "$BANK/manifest.ttl" /usr/lib/lv2/bankstown.lv2/
 

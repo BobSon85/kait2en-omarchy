@@ -39,6 +39,22 @@ reapplied by the system updater after a profile update.
 
 ## Development
 
+After the repository is public, installation is performed with:
+
+```sh
+omarchy plugin add https://github.com/<owner>/kait2en-omarchy.git --enable
+```
+
+Open the KaiT2en Audio widget and choose `Instaluj / napraw` to install the
+system dependencies and enable the DSP updater. To remove the shell plugin:
+
+```sh
+omarchy plugin remove kait2en.audio
+```
+
+The system integration has its own `scripts/uninstall.sh`; removing the shell
+plugin does not silently remove audio system files.
+
 Validate the manifest with:
 
 ```sh
