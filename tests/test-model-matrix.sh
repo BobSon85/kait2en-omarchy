@@ -2,6 +2,10 @@
 set -Eeuo pipefail
 ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 
+for script in "$ROOT"/scripts/*.sh "$ROOT"/eq/*.sh; do
+  [[ -x "$script" ]] || { echo "not executable: $script" >&2; exit 1; }
+done
+
 models=(
   MacBookAir8,1 MacBookAir8,2 MacBookAir9,1
   MacBookPro15,1 MacBookPro15,2 MacBookPro15,3 MacBookPro15,4
