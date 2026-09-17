@@ -64,7 +64,11 @@ else
 fi
 
 REV=$(git -C "$REPO" rev-parse HEAD)
-if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && -f "$BASE/installed-bass" && $(<"$BASE/installed-bass") == "$BASS_AMT" && -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
+BANK_REV=$(git -C "$BANK" rev-parse HEAD)
+if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && \
+      -f "$BASE/installed-bank-rev" && $(<"$BASE/installed-bank-rev") == "$BANK_REV" && \
+      -f "$BASE/installed-bass" && $(<"$BASE/installed-bass") == "$BASS_AMT" && \
+      -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
   echo "KAIT2EN: already current ($REV)"
   exit 0
 fi
@@ -125,6 +129,7 @@ wireplumber.profiles = { main = { node.software-dsp = required } }
 EOF
 
 printf '%s\n' "$REV" > "$BASE/installed-rev"
+printf '%s\n' "$BANK_REV" > "$BASE/installed-bank-rev"
 printf '%s\n' "$BASS_AMT" > "$BASE/installed-bass"
 restart_logged_in_wireplumber
-echo "KAIT2EN: installed $MODEL ($PROFILE), revision $REV, bass amount $BASS_AMT"
+echo "KAIT2EN: installed $MODEL ($PROFILE), KAIT2EN $REV, Bankstown $BANK_REV, bass amount $BASS_AMT"

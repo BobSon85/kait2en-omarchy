@@ -39,6 +39,11 @@ else
   timer_enabled=false
 fi
 
+installed_revision=unknown
+installed_bank_revision=unknown
+[[ -r /var/lib/kait2en-dsp/installed-rev ]] && installed_revision=$(< /var/lib/kait2en-dsp/installed-rev)
+[[ -r /var/lib/kait2en-dsp/installed-bank-rev ]] && installed_bank_revision=$(< /var/lib/kait2en-dsp/installed-bank-rev)
+
 if [[ "$profile" != unsupported && -f "/usr/share/t2-dsp/profiles/$profile/graph.json" ]]; then
   profile_installed=true
 else
@@ -76,5 +81,6 @@ if [[ -f "$eq_state" ]]; then
   fi
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" \
+  "$(json_escape "$installed_revision")" "$(json_escape "$installed_bank_revision")" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"
