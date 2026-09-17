@@ -65,10 +65,12 @@ fi
 
 REV=$(git -C "$REPO" rev-parse HEAD)
 BANK_REV=$(git -C "$BANK" rev-parse HEAD)
+UCM_SRC="$REPO/modules/t2bce_audio-alsa-ucm-conf/ucm2"
 if [[ -f "$BASE/installed-rev" && $(<"$BASE/installed-rev") == "$REV" && \
       -f "$BASE/installed-bank-rev" && $(<"$BASE/installed-bank-rev") == "$BANK_REV" && \
       -f "$BASE/installed-bass" && $(<"$BASE/installed-bass") == "$BASS_AMT" && \
-      -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" ]]; then
+      -f "/usr/share/t2-dsp/profiles/$PROFILE/graph.json" && \
+      -f "/usr/share/alsa/ucm2/AppleT2/HiFi-x2.conf" ]]; then
   echo "KAIT2EN: already current ($REV)"
   exit 0
 fi
@@ -81,8 +83,20 @@ cargo build --release --manifest-path "$BANK/Cargo.toml"
 }
 
 STAMP=$(date +%Y%m%d-%H%M%S)
+[[ -d "$UCM_SRC" ]] || { echo "KAIT2EN: upstream UCM files are missing" >&2; exit 1; }
 [[ -d /usr/share/t2-dsp ]] && cp -a /usr/share/t2-dsp "$BASE/backups/$STAMP-t2-dsp"
 [[ -d /usr/lib/lv2/bankstown.lv2 ]] && cp -a /usr/lib/lv2/bankstown.lv2 "$BASE/backups/$STAMP-bankstown"
+[[ -d /usr/share/alsa/ucm2/AppleT2 ]] && cp -a /usr/share/alsa/ucm2/AppleT2 "$BASE/backups/$STAMP-AppleT2-ucm"
+for ucm_dir in AppleT2x2 AppleT2x4 AppleT2x6; do
+  [[ -d "/usr/share/alsa/ucm2/conf.d/$ucm_dir" ]] && \
+    cp -a "/usr/share/alsa/ucm2/conf.d/$ucm_dir" "$BASE/backups/$STAMP-$ucm_dir-ucm"
+done
+
+install -d /usr/share/alsa/ucm2 /usr/share/alsa/ucm2/conf.d
+cp -a "$UCM_SRC/AppleT2" /usr/share/alsa/ucm2/
+for ucm_dir in AppleT2x2 AppleT2x4 AppleT2x6; do
+  [[ -d "$UCM_SRC/conf.d/$ucm_dir" ]] && cp -a "$UCM_SRC/conf.d/$ucm_dir" /usr/share/alsa/ucm2/conf.d/
+done
 
 install -d /usr/share/t2-dsp/profiles /usr/lib/lv2/bankstown.lv2 /usr/share/wireplumber/wireplumber.conf.d
 if [[ -d /usr/share/t2-dsp/profiles ]]; then

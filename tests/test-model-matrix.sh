@@ -17,7 +17,8 @@ done
 
 rg -q 'HiFi: Mic: source' "$ROOT/scripts/update-system.sh"
 rg -q 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
-rg -q 'apple-t2-audio-config' "$ROOT/scripts/install.sh"
+rg -q 'alsa-ucm-conf' "$ROOT/scripts/install.sh"
+rg -q 't2bce_audio-alsa-ucm-conf' "$ROOT/scripts/update-system.sh"
 rg -q 'modinfo t2bce_audio' "$ROOT/scripts/install.sh"
 
 if rg -q 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then

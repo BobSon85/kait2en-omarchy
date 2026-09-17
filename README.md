@@ -26,10 +26,12 @@ MacBookPro16,1–16,4. Unknown models are rejected before any privileged action.
 
 `install.sh` is intentionally a visible terminal workflow. It verifies that a
 T2-enabled kernel exposes `t2bce_audio`, installs the Arch dependencies
-including `apple-t2-audio-config` (UCM), builds the upstream DSP graph and
-Bankstown, installs the WirePlumber and udev rules and enables the daily
-`kait2en-dsp-update.timer`. The uninstaller disables only files owned by this
-integration and leaves backups in `/var/lib/kait2en-dsp`.
+including `alsa-ucm-conf`, then obtains the T2 UCM profiles from the KAIT2EN
+source checkout itself. This avoids depending on `apple-t2-audio-config`, an
+external package that is not present in every Arch repository. It then builds
+the upstream DSP graph and Bankstown, installs the WirePlumber and udev rules
+and enables the daily `kait2en-dsp-update.timer`. Existing UCM files are backed
+up under `/var/lib/kait2en-dsp` before being updated.
 
 The generated profile target adapts to both the legacy `Audio` ALSA card id and
 the upstream model-specific `t2-*` id. Speaker and internal-microphone
@@ -39,6 +41,11 @@ so the udev card-id rule can take effect cleanly.
 
 The plugin also includes a repair action for the known failure mode where a
 user-local Bankstown checkout duplicates the system LV2 plugin.
+
+The system uninstaller removes only the integration files it owns. It keeps
+the shared `AppleT2` UCM files in place so removing the plugin cannot break
+other T2 audio components; the pre-update copies remain available in the
+backup directory.
 
 The panel exposes both the optional 8-band user EQ and the KAIT2EN
 virtual-bass amount. The latter is stored separately from upstream graphs and

@@ -26,7 +26,7 @@ echo "This will install dependencies, build upstream DSP components and create a
 read -r -p "Continue? [y/N] " answer
 [[ "$answer" =~ ^[Yy]$ ]] || { echo "Cancelled."; exit 0; }
 
-sudo pacman -S --needed apple-t2-audio-config pipewire pipewire-audio pipewire-pulse pipewire-alsa wireplumber lsp-plugins-lv2 git rust base-devel
+sudo pacman -S --needed alsa-ucm-conf pipewire pipewire-audio pipewire-pulse pipewire-alsa wireplumber lsp-plugins-lv2 git rust base-devel
 sudo install -d /usr/local/libexec /etc/systemd/system
 sudo install -m 0755 "$ROOT/scripts/update-system.sh" /usr/local/libexec/kait2en-omarchy-update
 sudo install -m 0644 "$ROOT/systemd/kait2en-dsp-update.service" /etc/systemd/system/kait2en-dsp-update.service

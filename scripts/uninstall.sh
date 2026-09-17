@@ -2,6 +2,7 @@
 set -Eeuo pipefail
 
 echo "This removes the KAIT2EN system integration and keeps backups in /var/lib/kait2en-dsp."
+echo "Shared AppleT2 UCM profiles are kept for other T2 audio components."
 read -r -p "Continue? [y/N] " answer
 [[ "$answer" =~ ^[Yy]$ ]] || { echo "Cancelled."; exit 0; }
 
