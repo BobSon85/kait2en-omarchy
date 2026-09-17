@@ -328,7 +328,7 @@ Panel {
         Layout.fillWidth: true
         spacing: Style.space(6)
         Ui.Button { text: "ODŚWIEŻ"; onClicked: root.refresh() }
-        Ui.Button { text: "DIAGNOSTYKA"; onClicked: Quickshell.execDetached(["alacritty", "-e", root.diagnoseScript]) }
+        Ui.Button { text: "DIAGNOSTYKA"; onClicked: Quickshell.execDetached(["alacritty", "--class", "TUI.float", "-e", root.diagnoseScript]) }
       }
 
       RowLayout {
