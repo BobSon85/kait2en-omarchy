@@ -15,6 +15,9 @@ for model in "${models[@]}"; do
   rg -q "$model" "$ROOT/eq/apply.sh"
 done
 
+rg -q 'HiFi: Mic: source' "$ROOT/scripts/update-system.sh"
+rg -q 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
+
 if rg -q 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then
   echo 'installer contains an overly broad MacBook Pro pattern' >&2
   exit 1

@@ -32,6 +32,11 @@ if pactl list sinks short 2>/dev/null | awk '{print $2}' | grep -Fxq "audio_effe
 else
   dsp_sink=false
 fi
+if pactl list sources short 2>/dev/null | awk '{print $2}' | grep -Fxq "audio_effect.t2-${dsp_name:-unsupported}-mic"; then
+  dsp_source=true
+else
+  dsp_source=false
+fi
 
 if systemctl is-enabled --quiet kait2en-dsp-update.timer 2>/dev/null; then
   timer_enabled=true
@@ -81,6 +86,6 @@ if [[ -f "$eq_state" ]]; then
   fi
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"defaultSink":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$(json_escape "$sink")" "$timer_enabled" \
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"dspSource":%s,"defaultSink":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$dsp_source" "$(json_escape "$sink")" "$timer_enabled" \
   "$(json_escape "$installed_revision")" "$(json_escape "$installed_bank_revision")" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"

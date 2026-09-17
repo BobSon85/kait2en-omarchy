@@ -173,6 +173,8 @@ Panel {
         Text { text: value("profileInstalled", false) ? "zainstalowany" : "brak"; color: value("profileInstalled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Sink DSP"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("dspSink", false) ? "aktywny" : "nieaktywny"; color: value("dspSink", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: "Mikrofon DSP"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+        Text { text: value("dspSource", false) ? "aktywny" : "nieaktywny"; color: value("dspSource", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Aktualizacje"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("timerEnabled", false) ? "timer aktywny" : "timer wyłączony"; color: value("timerEnabled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: "Wyjście"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }

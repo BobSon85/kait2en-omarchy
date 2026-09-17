@@ -75,8 +75,8 @@ fi
 
 make -C "$REPO/dsp" build test
 cargo build --release --manifest-path "$BANK/Cargo.toml"
-[[ -f "$REPO/dsp/build/profiles/$PROFILE/graph.json" ]] || {
-  echo "KAIT2EN: upstream did not produce profile $PROFILE" >&2
+[[ -f "$REPO/dsp/build/profiles/$PROFILE/graph.json" && -f "$REPO/dsp/build/profiles/$PROFILE/mic.json" ]] || {
+  echo "KAIT2EN: upstream did not produce complete profile $PROFILE" >&2
   exit 1
 }
 
@@ -123,6 +123,24 @@ node.software-dsp.rules = [
   {
     matches = [ { alsa.id = "Audio", api.alsa.pcm.stream = "playback", device.profile.name = "HiFi: Speaker: sink" } ]
     actions = { create-filter = { filter-path = "/usr/share/t2-dsp/profiles/$PROFILE/graph.json", hide-parent = false } }
+  },
+  {
+    matches = [ { alsa.id = "t2-$PROFILE", api.alsa.pcm.stream = "capture", device.profile.name = "HiFi: Mic: source" } ]
+    actions = { create-filter = { filter-path = "/usr/share/t2-dsp/profiles/$PROFILE/mic.json", hide-parent = false } }
+  },
+  {
+    matches = [ { alsa.id = "Audio", api.alsa.pcm.stream = "capture", device.profile.name = "HiFi: Mic: source" } ]
+    actions = { create-filter = { filter-path = "/usr/share/t2-dsp/profiles/$PROFILE/mic.json", hide-parent = false } }
+  }
+]
+monitor.alsa.rules = [
+  {
+    matches = [ { alsa.id = "t2-$PROFILE", api.alsa.pcm.stream = "capture", device.profile.name = "HiFi: Mic: source" } ]
+    actions = { update-props = { node.name = "alsa_input.t2-$PROFILE.RawMic" } }
+  },
+  {
+    matches = [ { alsa.id = "Audio", api.alsa.pcm.stream = "capture", device.profile.name = "HiFi: Mic: source" } ]
+    actions = { update-props = { node.name = "alsa_input.t2-$PROFILE.RawMic" } }
   }
 ]
 wireplumber.profiles = { main = { node.software-dsp = required } }

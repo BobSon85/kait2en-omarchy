@@ -31,8 +31,10 @@ uninstaller disables only files owned by this integration and leaves backups in
 `/var/lib/kait2en-dsp`.
 
 The generated profile target adapts to both the legacy `Audio` ALSA card id and
-the upstream model-specific `t2-*` id. Reboot after the first installation so
-the udev card-id rule can take effect cleanly.
+the upstream model-specific `t2-*` id. Speaker and internal-microphone
+profiles are activated only for the matching UCM Speaker/Mic nodes; headphones
+and headset microphones remain untouched. Reboot after the first installation
+so the udev card-id rule can take effect cleanly.
 
 The plugin also includes a repair action for the known failure mode where a
 user-local Bankstown checkout duplicates the system LV2 plugin.
