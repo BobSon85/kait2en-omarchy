@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "author": "Krzysiek",
   "license": "GPL-3.0-or-later",
-  "description": "Native KAIT2EN audio DSP management for Apple T2 Macs on Omarchy.",
+  "description": "Native KaiT2en speaker DSP, automatic updates and diagnostics for Apple T2 Macs running Arch Linux and Omarchy.",
   "kinds": ["bar-widget", "panel"],
   "entryPoints": {
     "barWidget": "BarWidget.qml",

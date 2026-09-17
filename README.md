@@ -4,6 +4,25 @@ Native Omarchy integration for the host-side PipeWire DSP profiles from
 [KaiT2en-Fedora](https://github.com/kaiT2en/KaiT2en-Fedora), intended for Apple
 T2 Macs running Arch Linux and Omarchy.
 
+## Why this plugin exists
+
+Apple T2 MacBooks can run Linux very well, but their internal speakers are not
+ordinary ALSA devices. The T2 audio path needs model-specific UCM profiles,
+host-side DSP graphs and a correctly wired PipeWire/WirePlumber setup. Without
+that integration, the speakers may be quiet, unbalanced or missing entirely.
+
+KaiT2en provides the audio processing that makes the built-in speakers useful
+on supported T2 Macs. This plugin brings that work into Omarchy as a native,
+discoverable control surface: it detects the exact Mac model, installs the
+matching profile, keeps the DSP components updated and exposes status,
+virtual bass, an optional equalizer and diagnostics from one panel.
+
+The plugin is intended for users who want their MacBook's internal speakers to
+work properly on Arch/Omarchy without maintaining a collection of manual
+PipeWire commands and model-specific configuration files. It does not replace
+Omarchy's audio panel, alter headphone routing or hide system changes: it adds
+the missing T2 speaker integration and leaves the normal audio controls intact.
+
 ## Design
 
 The plugin is a user interface and diagnostics layer. It does not replace the
