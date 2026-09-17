@@ -21,7 +21,7 @@ Panel {
   property var eqGains: [0, 0, 0, 0, 0, 0, 0, 0]
   property real bassAmount: 3.0
   property bool eqDirty: false
-  readonly property bool polish: String(Qt.locale().name).toLowerCase().indexOf("pl") === 0
+  readonly property bool isPolishLocale: String(Qt.locale().name).toLowerCase().indexOf("pl") === 0
   readonly property bool statusRefreshing: statusProcess.running
 
   readonly property string statusScript: String(Qt.resolvedUrl("scripts/status.sh")).replace(/^file:\/\//, "")
@@ -32,7 +32,7 @@ Panel {
   readonly property string eqScript: String(Qt.resolvedUrl("eq/apply.sh")).replace(/^file:\/\//, "")
 
   function tr(polishText, englishText) {
-    return root.polish ? polishText : englishText
+    return root.isPolishLocale ? polishText : englishText
   }
 
   property Process statusProcess: Process {
