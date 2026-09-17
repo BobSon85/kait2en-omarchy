@@ -11,9 +11,10 @@ model-specific KAIT2EN speaker graph. Installation and updates are performed by
 auditable terminal scripts because Omarchy's plugin installer deliberately does
 not run plugin install hooks or `sudo` commands.
 
-The user equalizer will be an optional separate PipeWire stage. `Flat` must
-always be a safe, zero-change setting and disabling it must remove the user
-stage rather than alter the upstream KAIT2EN profile.
+The user equalizer is an optional separate PipeWire stage. `Flat` is a safe,
+zero-change setting and disabling it removes the user stage rather than
+altering the upstream KAIT2EN profile. The bar icon follows the current output
+volume and mute state.
 
 ## Supported hardware
 
@@ -67,7 +68,7 @@ reapplied by the system updater after a profile update.
 
 ## Development
 
-After the repository is public, install it with the repository URL:
+Install it with the repository URL:
 
 ```sh
 omarchy plugin add https://github.com/USER/REPOSITORY.git --enable
@@ -99,6 +100,16 @@ omarchy plugin enable kait2en.audio
 
 The installer and updater detect the hardware profile, create backups, and
 never touch unsupported Macs.
+
+Before a real installation, run the non-destructive preflight check:
+
+```sh
+./scripts/install.sh --check
+```
+
+The check validates the running Arch/T2 environment and model without
+installing packages, changing PipeWire, or writing system files. The full
+installer remains an explicit terminal workflow because it needs `sudo`.
 
 ## License
 

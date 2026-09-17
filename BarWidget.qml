@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 import qs.Commons
 import qs.Ui
 
@@ -9,7 +10,17 @@ BarWidget {
   moduleName: "kait2en.audio"
 
   readonly property bool opened: panelItem ? panelItem.opened === true : false
+  readonly property var sink: Pipewire.defaultAudioSink
+  readonly property real outputVolume: sink && sink.audio ? sink.audio.volume : 0
+  readonly property bool outputMuted: sink && sink.audio ? sink.audio.muted : false
   property var panelItem: null
+
+  function audioIcon() {
+    if (root.outputMuted) return "󰝟"
+    if (root.outputVolume <= 0.33) return "󰖀"
+    if (root.outputVolume <= 0.66) return "󰕿"
+    return "󰕾"
+  }
 
   function injectPanel() {
     var target = panelLoader.item
@@ -41,6 +52,8 @@ BarWidget {
     }
   }
 
+  PwObjectTracker { objects: root.sink ? [root.sink] : [] }
+
   IpcHandler {
     target: "kait2en.audio"
     function open(): void { if (root.panelItem) root.panelItem.open() }
@@ -52,7 +65,7 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: "󰓃"
+    text: root.audioIcon()
     tooltipText: root.opened ? "Close KaiT2en Audio" : "KaiT2en Audio"
     onPressed: function(b) {
       if (b === Qt.LeftButton) root.togglePanel()

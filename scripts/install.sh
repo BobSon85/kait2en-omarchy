@@ -2,6 +2,10 @@
 set -Eeuo pipefail
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+CHECK_ONLY=0
+if [[ "${1:-}" == "--check" ]]; then
+  CHECK_ONLY=1
+fi
 MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
 case "$MODEL" in
   MacBookAir8,1|MacBookAir8,2|MacBookAir9,1|\
@@ -19,6 +23,13 @@ if ! modinfo t2bce_audio >/dev/null 2>&1; then
   echo "KAIT2EN: t2bce_audio is not available in the running kernel." >&2
   echo "Boot a T2-enabled kernel (for example linux-t2) before installing." >&2
   exit 2
+fi
+
+if (( CHECK_ONLY )); then
+  echo "KAIT2EN preflight OK for $MODEL"
+  echo "Required packages: alsa-ucm-conf pipewire pipewire-audio pipewire-pulse pipewire-alsa wireplumber lsp-plugins-lv2 git rust base-devel"
+  echo "No system changes were made."
+  exit 0
 fi
 
 echo "KAIT2EN installer for $MODEL"
