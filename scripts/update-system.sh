@@ -37,9 +37,10 @@ PROFILE=$(profile_for_model "$MODEL") || {
 
 BASS_AMT=3.0
 if [[ -f "$SETTINGS" ]]; then
-  # Only this variable is accepted from the administrator-owned settings file.
-  # shellcheck disable=SC1090
-  source "$SETTINGS"
+  # Read only the documented key; never execute settings as shell code.
+  configured_bass=$(sed -n 's/^BASS_AMT[[:space:]]*=[[:space:]]*//p' "$SETTINGS" | head -1)
+  [[ -n "$configured_bass" ]] || { echo 'KAIT2EN: missing BASS_AMT' >&2; exit 1; }
+  BASS_AMT="$configured_bass"
 fi
 [[ "$BASS_AMT" =~ ^[0-9]+([.][0-9]+)?$ ]] || { echo 'KAIT2EN: invalid BASS_AMT' >&2; exit 1; }
 awk -v v="$BASS_AMT" 'BEGIN { exit !(v >= 0 && v <= 15) }' || { echo 'KAIT2EN: BASS_AMT outside 0..15' >&2; exit 1; }
