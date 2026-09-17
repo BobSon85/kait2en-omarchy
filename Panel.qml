@@ -229,7 +229,7 @@ Panel {
         Text { text: "Aktualizacje"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
         Text { text: value("timerEnabled", false) ? "󰚰" : "󰅖"; color: value("timerEnabled", false) ? Color.accent : Color.urgent; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body }
         Text { text: "Wyjście"; color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
-        Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; elide: Text.ElideRight; Layout.maximumWidth: Style.space(260) }
+        Text { text: value("defaultSink", "unknown"); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; elide: Text.ElideRight; Layout.maximumWidth: Style.space(190) }
       }
 
       RowLayout {
