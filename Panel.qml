@@ -115,10 +115,12 @@ Panel {
     bar: root.bar
     open: root.opened
     centerOnBar: false
+    focusTarget: keyCatcher
     contentWidth: panel.fittedContentWidth(Style.space(430))
     contentHeight: panel.fittedContentHeight(contentColumn.implicitHeight + Style.space(24))
 
     PanelKeyCatcher {
+      id: keyCatcher
       anchors.fill: parent
       onCloseRequested: root.close()
       onTabRequested: function(direction) {
@@ -273,23 +275,22 @@ Panel {
           model: ["60", "120", "250", "500", "1k", "2k", "4k", "8k"]
           delegate: RowLayout {
             required property string modelData
-            required property int delegateIndex
-            delegateIndex: index
+            required property int index
             Layout.fillWidth: true
             Text { text: modelData + " Hz"; Layout.preferredWidth: Style.space(55); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
             Ui.PanelSlider {
               bar: root.bar
               Layout.fillWidth: true
               minimum: -6; maximum: 6; step: 0.5
-              value: root.eqGains[delegateIndex]
+              value: root.eqGains[index]
               onMoved: function(v) {
                 var updated = root.eqGains.slice()
-                updated[delegateIndex] = v
+                updated[index] = v
                 root.eqGains = updated
                 root.eqDirty = true
               }
             }
-            Text { text: (root.eqGains[delegateIndex] >= 0 ? "+" : "") + Number(root.eqGains[delegateIndex]).toFixed(1) + " dB"; Layout.preferredWidth: Style.space(62); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+            Text { text: (root.eqGains[index] >= 0 ? "+" : "") + Number(root.eqGains[index]).toFixed(1) + " dB"; Layout.preferredWidth: Style.space(62); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
           }
         }
 
