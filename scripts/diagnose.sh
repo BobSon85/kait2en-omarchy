@@ -14,3 +14,7 @@ for path in "$HOME/.lv2/bankstown.lv2" /usr/lib/lv2/bankstown.lv2; do
 done
 printf '%s\n' '--- recent WirePlumber errors ---'
 journalctl --user -b --no-pager -u wireplumber -p warning..err 2>&1 | tail -40 || true
+printf '%s\n' '' 'Naciśnij Q, aby zamknąć to okno.'
+while IFS= read -r -n 1 key; do
+  [[ "$key" == "q" || "$key" == "Q" ]] && break
+done
