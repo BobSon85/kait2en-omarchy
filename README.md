@@ -53,10 +53,10 @@ reapplied by the system updater after a profile update.
 
 ## Development
 
-After the repository is public, installation is performed with:
+After the repository is public, install it with the repository URL:
 
 ```sh
-omarchy plugin add https://github.com/<owner>/kait2en-omarchy.git --enable
+omarchy plugin add https://github.com/USER/REPOSITORY.git --enable
 ```
 
 Open the KaiT2en Audio widget and choose `Instaluj / napraw` to install the

@@ -7,4 +7,5 @@ done
 omarchy plugin validate "$ROOT"
 "$ROOT/tests/test-eq.sh"
 "$ROOT/tests/test-model-matrix.sh"
+"$ROOT/tests/test-publishing.sh"
 printf '%s\n' 'plugin manifest and shell scripts: OK'
