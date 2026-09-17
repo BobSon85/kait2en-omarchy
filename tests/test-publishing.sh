@@ -20,8 +20,9 @@ if "." not in manifest["id"]:
     raise SystemExit("manifest id is not namespaced")
 PY
 
-if rg -n '<owner>|<github-user>|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY|gh[pousr]_[A-Za-z0-9]+' \
-  "$ROOT" -g '!tests/test-publishing.sh' -g '!.git'; then
+if grep -RInE --exclude='test-publishing.sh' --exclude-dir=.git \
+  '<owner>|<github-user>|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY|gh[pousr]_[A-Za-z0-9]+' \
+  "$ROOT"; then
   echo 'publication scan found a placeholder or credential pattern' >&2
   exit 1
 fi

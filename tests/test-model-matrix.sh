@@ -13,19 +13,19 @@ models=(
 )
 
 for model in "${models[@]}"; do
-  rg -q "$model" "$ROOT/scripts/install.sh"
-  rg -q "$model" "$ROOT/scripts/update-system.sh"
-  rg -q "$model" "$ROOT/scripts/status.sh"
-  rg -q "$model" "$ROOT/eq/apply.sh"
+  grep -qE "$model" "$ROOT/scripts/install.sh"
+  grep -qE "$model" "$ROOT/scripts/update-system.sh"
+  grep -qE "$model" "$ROOT/scripts/status.sh"
+  grep -qE "$model" "$ROOT/eq/apply.sh"
 done
 
-rg -q 'HiFi: Mic: source' "$ROOT/scripts/update-system.sh"
-rg -q 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
-rg -q 'alsa-ucm-conf' "$ROOT/scripts/install.sh"
-rg -q 't2bce_audio-alsa-ucm-conf' "$ROOT/scripts/update-system.sh"
-rg -q 'modinfo t2bce_audio' "$ROOT/scripts/install.sh"
+grep -qE 'HiFi: Mic: source' "$ROOT/scripts/update-system.sh"
+grep -qE 'monitor\.alsa\.rules' "$ROOT/scripts/update-system.sh"
+grep -qE 'alsa-ucm-conf' "$ROOT/scripts/install.sh"
+grep -qE 't2bce_audio-alsa-ucm-conf' "$ROOT/scripts/update-system.sh"
+grep -qE 'modinfo t2bce_audio' "$ROOT/scripts/install.sh"
 
-if rg -q 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then
+if grep -qE 'MacBookPro15,\*|MacBookPro16,\*' "$ROOT/scripts/install.sh"; then
   echo 'installer contains an overly broad MacBook Pro pattern' >&2
   exit 1
 fi
