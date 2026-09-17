@@ -115,8 +115,8 @@ Panel {
     bar: root.bar
     open: root.opened
     centerOnBar: true
-    contentWidth: root.fittedContentWidth(Style.space(430))
-      contentHeight: root.fittedContentHeight(contentColumn.implicitHeight + Style.space(24))
+    contentWidth: panel.fittedContentWidth(Style.space(430))
+    contentHeight: panel.fittedContentHeight(contentColumn.implicitHeight + Style.space(24))
 
     PanelKeyCatcher {
       anchors.fill: parent
@@ -273,21 +273,23 @@ Panel {
           model: ["60", "120", "250", "500", "1k", "2k", "4k", "8k"]
           delegate: RowLayout {
             required property string modelData
+            required property int delegateIndex
+            delegateIndex: index
             Layout.fillWidth: true
             Text { text: modelData + " Hz"; Layout.preferredWidth: Style.space(55); color: Color.muted; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
             Ui.PanelSlider {
               bar: root.bar
               Layout.fillWidth: true
               minimum: -6; maximum: 6; step: 0.5
-              value: root.eqGains[index]
+              value: root.eqGains[delegateIndex]
               onMoved: function(v) {
                 var updated = root.eqGains.slice()
-                updated[index] = v
+                updated[delegateIndex] = v
                 root.eqGains = updated
                 root.eqDirty = true
               }
             }
-            Text { text: (root.eqGains[index] >= 0 ? "+" : "") + Number(root.eqGains[index]).toFixed(1) + " dB"; Layout.preferredWidth: Style.space(62); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
+            Text { text: (root.eqGains[delegateIndex] >= 0 ? "+" : "") + Number(root.eqGains[delegateIndex]).toFixed(1) + " dB"; Layout.preferredWidth: Style.space(62); color: root.bar ? root.bar.foreground : Color.foreground; font.family: root.bar ? root.bar.fontFamily : Style.font.family }
           }
         }
 
