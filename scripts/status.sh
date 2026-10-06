@@ -22,8 +22,12 @@ case "$model" in
   MacBookPro16,2) profile=16_2; dsp_name=162 ;;
   MacBookPro16,3) profile=16_3; dsp_name=163 ;;
   MacBookPro16,4) profile=16_4; dsp_name=164 ;;
+  iMac20,1) profile=imac20_1; dsp_name=imac201 ;;
+  iMacPro1,1) profile=imacpro1_1; dsp_name=imacpro11 ;;
   *) profile=unsupported ;;
 esac
+dsp_source_supported=true
+case "$model" in iMac20,1|iMacPro1,1) dsp_source_supported=false ;; esac
 
 sink=$(pactl info 2>/dev/null | sed -n 's/^Default Sink: //p')
 [[ -n "$sink" ]] || sink=unknown
@@ -99,6 +103,6 @@ if [[ -f "$eq_state" ]]; then
   fi
 fi
 
-printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"dspSource":%s,"defaultSink":"%s","nativeSink":"%s","outputMode":"%s","pipewireQuantum":"%s","pipewireMinQuantum":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
-  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$dsp_source" "$(json_escape "$sink")" "$(json_escape "$native_sink")" "$output_mode" "$pipewire_quantum" "$pipewire_min_quantum" "$timer_enabled" \
+printf '{"model":"%s","profile":"%s","profileInstalled":%s,"dspSink":%s,"dspSource":%s,"dspSourceSupported":%s,"defaultSink":"%s","nativeSink":"%s","outputMode":"%s","pipewireQuantum":"%s","pipewireMinQuantum":"%s","timerEnabled":%s,"kait2enRevision":"%s","bankstownRevision":"%s","duplicateBankstown":%s,"bassAmount":%s,"eqEnabled":%s,"eqGains":%s}\n' \
+  "$(json_escape "$model")" "$profile" "$profile_installed" "$dsp_sink" "$dsp_source" "$dsp_source_supported" "$(json_escape "$sink")" "$(json_escape "$native_sink")" "$output_mode" "$pipewire_quantum" "$pipewire_min_quantum" "$timer_enabled" \
   "$(json_escape "$installed_revision")" "$(json_escape "$installed_bank_revision")" "$duplicate_bankstown" "$bass" "$eq_enabled" "$eq_gains"

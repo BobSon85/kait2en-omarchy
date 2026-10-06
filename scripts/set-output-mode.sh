@@ -16,6 +16,7 @@ case "$model" in
   MacBookPro15,1) dsp_name=151 ;; MacBookPro15,2) dsp_name=152 ;; MacBookPro15,3) dsp_name=153 ;;
   MacBookPro15,4) dsp_name=154 ;; MacBookPro16,1) dsp_name=161 ;; MacBookPro16,2) dsp_name=162 ;;
   MacBookPro16,3) dsp_name=163 ;; MacBookPro16,4) dsp_name=164 ;;
+  iMac20,1) dsp_name=imac201 ;; iMacPro1,1) dsp_name=imacpro11 ;;
   *) echo "KAIT2EN: unsupported model: $model" >&2; exit 2 ;;
 esac
 

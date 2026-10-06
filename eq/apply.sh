@@ -28,6 +28,8 @@ case "$model" in
   MacBookPro16,2) target=audio_effect.t2-162-speakers ;;
   MacBookPro16,3) target=audio_effect.t2-163-speakers ;;
   MacBookPro16,4) target=audio_effect.t2-164-speakers ;;
+  iMac20,1) target=audio_effect.t2-imac201-speakers ;;
+  iMacPro1,1) target=audio_effect.t2-imacpro11-speakers ;;
   *) echo "unsupported model: $model" >&2; exit 2 ;;
 esac
 

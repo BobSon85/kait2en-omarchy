@@ -6,7 +6,7 @@ T2 Macs running Arch Linux and Omarchy.
 
 ## Why this plugin exists
 
-Apple T2 MacBooks can run Linux very well, but their internal speakers are not
+Apple T2 Macs can run Linux very well, but their internal speakers are not
 ordinary ALSA devices. The T2 audio path needs model-specific UCM profiles,
 host-side DSP graphs and a correctly wired PipeWire/WirePlumber setup. Without
 that integration, the speakers may be quiet, unbalanced or missing entirely.
@@ -17,8 +17,8 @@ discoverable control surface: it detects the exact Mac model, installs the
 matching profile, keeps the DSP components updated and exposes status,
 virtual bass, an optional equalizer and diagnostics from one panel.
 
-The plugin is intended for users who want their MacBook's internal speakers to
-work properly on Arch/Omarchy without maintaining a collection of manual
+The plugin is intended for users who want supported T2 Macs' internal speakers
+to work properly on Arch/Omarchy without maintaining a collection of manual
 PipeWire commands and model-specific configuration files. It does not replace
 Omarchy's audio panel, alter headphone routing or hide system changes: it adds
 the missing T2 speaker integration and leaves the normal audio controls intact.
@@ -38,9 +38,9 @@ white means the DSP output is active, while red means it is inactive or muted.
 ## Supported hardware
 
 The installer reads the DMI product name and follows the profile mapping from
-the KAIT2EN source. The supported MacBook matrix is:
+the KAIT2EN source. The supported model matrix is:
 
-| MacBook | KAIT2EN profile |
+| Mac model | KAIT2EN profile |
 | --- | --- |
 | Air 2018 | `MacBookAir8,1` → `8_1` |
 | Air 2019 | `MacBookAir8,2` → `8_2` |
@@ -53,6 +53,11 @@ the KAIT2EN source. The supported MacBook matrix is:
 | Pro 13-inch 2020, 4 Thunderbolt ports | `MacBookPro16,2` → `16_2` |
 | Pro 13-inch 2020, 2 Thunderbolt ports | `MacBookPro16,3` → `16_3` |
 | Pro 16-inch 2019 | `MacBookPro16,4` → `16_4` |
+| iMac 27-inch 2020 | `iMac20,1` → `imac20_1` |
+| iMac Pro 2017 | `iMacPro1,1` → `imacpro1_1` |
+
+The upstream iMac profiles provide speaker DSP but no DSP microphone graph. The
+panel marks DSP microphone processing as unavailable on those two models.
 
 Unknown models are rejected before any privileged action.
 
@@ -90,6 +95,11 @@ backup directory.
 The panel exposes both the optional 8-band user EQ and the KAIT2EN
 virtual-bass amount. The latter is stored separately from upstream graphs and
 reapplied by the system updater after a profile update.
+
+The system updater fetches KAIT2EN and Bankstown at the full commit IDs pinned
+in `scripts/update-system.sh`; it does not build the moving upstream branches.
+To update either component, review the upstream changes, change its pinned SHA,
+then publish a plugin release containing that reviewed pin.
 
 ## Languages
 

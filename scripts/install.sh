@@ -10,7 +10,8 @@ MODEL=$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)
 case "$MODEL" in
   MacBookAir8,1|MacBookAir8,2|MacBookAir9,1|\
   MacBookPro15,1|MacBookPro15,2|MacBookPro15,3|MacBookPro15,4|\
-  MacBookPro16,1|MacBookPro16,2|MacBookPro16,3|MacBookPro16,4) ;;
+  MacBookPro16,1|MacBookPro16,2|MacBookPro16,3|MacBookPro16,4|\
+  iMac20,1|iMacPro1,1) ;;
   *) echo "KAIT2EN: unsupported or unknown model: $MODEL" >&2; exit 2 ;;
 esac
 

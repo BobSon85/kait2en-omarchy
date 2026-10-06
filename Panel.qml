@@ -108,8 +108,8 @@ Panel {
   readonly property color panelForeground: root.bar ? root.bar.foreground : Color.foreground
   readonly property color cardFill: Qt.alpha(root.panelForeground, 0.06)
 
-  function statusGlyph(ok) { return ok ? "󰄬" : "󰅖" }
-  function statusTone(ok) { return ok ? Color.accent : Color.urgent }
+  function statusGlyph(ok, supported) { return supported === false ? "—" : (ok ? "󰄬" : "󰅖") }
+  function statusTone(ok, supported) { return supported === false ? Color.muted : (ok ? Color.accent : Color.urgent) }
 
   Component.onCompleted: refresh()
 
@@ -249,7 +249,7 @@ Panel {
           model: [
             { label: root.tr("Profil", "Profile"), detail: root.tr("zainstalowany", "installed"), ok: value("profileInstalled", false) },
             { label: root.tr("Wyjście DSP", "DSP output"), detail: root.tr("aktywne", "active"), ok: value("dspSink", false) },
-            { label: root.tr("Mikrofon DSP", "DSP microphone"), detail: root.tr("aktywne", "active"), ok: value("dspSource", false) },
+            { label: root.tr("Mikrofon DSP", "DSP microphone"), detail: value("dspSourceSupported", true) ? root.tr("aktywne", "active") : root.tr("brak profilu", "not provided"), ok: value("dspSource", false), supported: value("dspSourceSupported", true) },
             { label: root.tr("Aktualizacje", "Updates"), detail: root.tr("codziennie", "daily"), ok: value("timerEnabled", false) },
             { label: root.tr("Bufor PipeWire", "PipeWire buffer"), detail: Number(value("pipewireQuantum", 0)) === 1024 ? "1024 frames" : "check", ok: Number(value("pipewireQuantum", 0)) === 1024 }
           ]
@@ -269,8 +269,8 @@ Panel {
               spacing: Style.space(9)
 
               Text {
-                text: root.statusGlyph(modelData.ok)
-                color: root.statusTone(modelData.ok)
+                text: root.statusGlyph(modelData.ok, modelData.supported)
+                color: root.statusTone(modelData.ok, modelData.supported)
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
                 font.pixelSize: Style.font.title
               }
@@ -279,7 +279,7 @@ Panel {
                 Layout.fillWidth: true
                 spacing: 0
                 Text { text: modelData.label; color: root.panelForeground; font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.body; elide: Text.ElideRight; Layout.fillWidth: true }
-                Text { text: modelData.detail.toUpperCase(); color: root.statusTone(modelData.ok); font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true; font.letterSpacing: 0.8 }
+                Text { text: modelData.detail.toUpperCase(); color: root.statusTone(modelData.ok, modelData.supported); font.family: root.bar ? root.bar.fontFamily : Style.font.family; font.pixelSize: Style.font.caption; font.bold: true; font.letterSpacing: 0.8 }
               }
             }
           }
